@@ -1,10 +1,11 @@
 class PostsController < ApplicationController
+  skip_before_action :require_login, only: %i[index show]
   def index
     @posts = Post.all.order(created_at: :desc)
   end
 
   def show
-    @post = find_post(params[:id])
+    @post = Post.find(params[:id])
   end
 
   def new
@@ -16,8 +17,7 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = Post.new(post_params)
-    @post.user_id = 1
+    @post = current_user.posts.build(post_params)
     if @post.save
       redirect_to root_path
     else
@@ -43,7 +43,7 @@ class PostsController < ApplicationController
   private
 
   def find_post(id)
-    Post.find(id)
+    current_user.posts.find(id)
   end
 
   def post_params
