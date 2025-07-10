@@ -1,4 +1,7 @@
 <h3><%= @post.title %></h3>
 <p><%= @post.content %></p>
-<%= link_to "編集", edit_post_path(@post) %>
+<p><%= @post.user_id %></p>
+<% if current_user && current_user.id == @post.user_id %>
+  <%= link_to "編集", edit_post_path(@post) %>
+<% end%>
 <%= link_to "戻る", root_path %>
