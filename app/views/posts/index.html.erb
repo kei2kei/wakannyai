@@ -1,3 +1,4 @@
+<%= render 'search_form' %>
 <% @posts.each do |post| %>
   <li><%= link_to post.title, post_path(post) %>
     <% if current_user && current_user.id == post.user_id %>
@@ -5,6 +6,6 @@
     <% end %>
   </li>
 <% end %>
-<% if current_user && current_user.id == post.user_id %>
+<% if current_user %>
   <%= link_to "新規作成", new_post_path %>
 <% end %>
