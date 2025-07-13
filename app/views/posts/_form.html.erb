@@ -1,0 +1,9 @@
+<%= form_with model: post do |f| %>
+  <%= f.label :title %>
+  <%= f.text_field :title %>
+  <%= f.label :content %>
+  <%= f.text_area :content %>
+  <%= f.label :tag_names, "タグ" %>
+  <%= f.text_field :tag_names, value: post.tags.map(&:name).join(', ') %>
+  <%= f.submit post.new_record? ? '投稿する' : '更新する' %>
+<% end %>

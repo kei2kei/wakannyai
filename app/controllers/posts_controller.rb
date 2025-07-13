@@ -2,7 +2,7 @@ class PostsController < ApplicationController
   skip_before_action :require_login, only: %i[index show]
   def index
     @q = Post.ransack(params[:q])
-    @posts = @q.result(distinct: true)
+    @posts = @q.result(distinct: true).includes(:post_tags, :tags).order(created_at: :desc)
   end
 
   def show
@@ -29,7 +29,7 @@ class PostsController < ApplicationController
   def update
     @post = find_post(params[:id])
     if @post.update(post_params)
-      redirect_to root_path
+      redirect_to post_path(@post.id)
     else
       render :edit, status: :unprocessable_entity
     end
@@ -48,6 +48,6 @@ class PostsController < ApplicationController
   end
 
   def post_params
-    params.require(:post).permit(:title, :content)
+    params.require(:post).permit(:title, :content, :tag_names)
   end
 end
