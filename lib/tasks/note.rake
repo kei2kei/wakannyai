@@ -10,10 +10,22 @@ namespace :note do
     puts "インポート開始"
 
     begin
+      rss_xml_data = URI.open(NOTE_RSS_URL).read
+      nokogiri_doc = Nokogiri::XML(rss_xml_data)
       rss = RSS::Parser.parse(URI.open(NOTE_RSS_URL).read, false)
+      namespaces = { 'media' => 'http://search.yahoo.com/mrss/' }
       rss.items.each do |item|
+        note_thumbnail_url = nil
+        item_node = nokogiri_doc.at_xpath("//item[link='#{item.link}']", namespaces)
+        if item_node
+          # 該当の <item> 要素の中から <media:thumbnail> 要素を探す
+          thumbnail_node = item_node.at_xpath('media:thumbnail', namespaces)
+          if thumbnail_node
+            note_thumbnail_url = thumbnail_node.content.strip # ★要素のテキストコンテンツを取得★
+          end
+        end
+
         # Note記事のURLが既に存在するかチェックして重複を避ける
-        # 同じ記事を複数回インポートしないようにチェック
         unless Post.exists?(note_url: item.link)
           # PostモデルにNote記事として保存
           Post.create!(
@@ -23,7 +35,8 @@ namespace :note do
             is_note_article: true,
             created_at: item.pubDate, # Noteの公開日時をそのまま使用
             updated_at: item.pubDate, # Noteの公開日時をそのまま使用
-            user: importer_user
+            user: importer_user,
+            note_thumbnail_url: note_thumbnail_url
           )
           puts "インポートした記事: #{item.title}"
         else
