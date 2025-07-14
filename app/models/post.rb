@@ -15,6 +15,9 @@ class Post < ApplicationRecord
     ["user", "tags"]
   end
 
+  has_rich_text :content
+  has_one_attached :thumbnail
+
   belongs_to :user
   has_many :post_tags, dependent: :destroy
   has_many :tags, through: :post_tags
