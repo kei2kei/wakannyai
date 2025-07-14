@@ -1,7 +1,7 @@
 <%= render 'search_form' %>
 <% @posts.each do |post| %>
   <li><%= link_to post.title, post_path(post) %>
-    <% if current_user && current_user.id == post.user_id %>
+    <% if current_user && current_user.id == post.user_id && !post.is_note_article %>
       <span><%= link_to "削除", post_path(post), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %></span>
     <% end %>
   </li>
