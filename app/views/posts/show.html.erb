@@ -1,4 +1,7 @@
 <h3>タイトル：<%= @post.title %></h3>
+<% if @post.thumbnail.attached? %>
+  <%= image_tag @post.thumbnail.variant(resize_to_limit: [200, 100]), alt: @post.title %>
+<% end %>
 <p>内容：<%= @post.content %></p>
 <p>投稿者：<%= @post.user_id %></p>
 <% if @post.tags.any? %>
