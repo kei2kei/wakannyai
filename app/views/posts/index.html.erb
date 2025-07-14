@@ -6,6 +6,7 @@
     <% end %>
   </li>
 <% end %>
+<%= paginate @posts, theme: 'bootstrap-5' %>
 <% if current_user %>
   <%= link_to "新規作成", new_post_path %>
 <% end %>
