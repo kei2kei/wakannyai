@@ -3,12 +3,12 @@
   <%= image_tag @post.thumbnail.variant(resize_to_limit: [200, 100]), alt: @post.title %>
 <% end %>
 <p>内容：<%= @post.content %></p>
-<p>投稿者：<%= @post.user_id %></p>
+<p>投稿者：<%= @post.user.name %></p>
 <% if @post.tags.any? %>
   <p>タグ：<%= @post.tags.map(&:name).join(', ') %></p>
 <% end %>
-<% if current_user && current_user.id == @post.user_id %>
+<% if current_user && current_user.id == @post.user_id && !@post.is_note_article %>
   <%= link_to "編集", edit_post_path(@post) %>
-  <%= link_to "削除", post_path(post), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %>
+  <%= link_to "削除", post_path(@post), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %>
 <% end%>
 <%= link_to "戻る", root_path %>
