@@ -1,3 +1,22 @@
+<div class="contribution-calendar">
+  <ul class="week-days">
+    <div>日</div>
+    <div>月</div>
+    <div>火</div>
+    <div>水</div>
+    <div>木</div>
+    <div>金</div>
+    <div>土</div>
+  </ul>
+  <div class="contribution-grid">
+    <% @git_hub_contributions.each do |contribution| %>
+      <div class="contribution-day" style="background-color: <%= contribution.color %>;">
+        <%= contribution.contribution_count %>
+        <%= contribution.date.day %>
+      </div>
+    <% end %>
+  </div>
+</div>
 <%= render 'search_form' %>
 <% @posts.each do |post| %>
   <div>

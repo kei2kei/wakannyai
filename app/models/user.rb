@@ -7,4 +7,5 @@ class User < ApplicationRecord
   validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
 
   has_many :posts, dependent: :destroy
+  has_many :git_hub_contributions, dependent: :destroy
 end
