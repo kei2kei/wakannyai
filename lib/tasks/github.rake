@@ -44,20 +44,22 @@ namespace :github do
       response = https.request(request)
       response_body = JSON.parse(response.body)
 
-      # 昨日のデータを抽出、nilエラーを防ぐためdigを使用
-      data_of_yesterday = response_body.dig("data", "user", "contributionsCollection", "contributionCalendar", "weeks", -1, "contributionDays", -2)
-      # date_of_yesterdayにはその日の日付、色（草の色）、コントリビューション数が入っている。
-      date, color, contribution_count = data_of_yesterday.values_at("date", "color", "contributionCount") if data_of_yesterday
-      puts '--------'
-      puts date
-      puts color
-      puts contribution_count
-      # テーブルへの保存、重複回避のためにfind_or_initializeを使用し、レコードが新しいか確認
-      contribution = user.git_hub_contributions.find_or_initialize_by(user_id: user.id, date: date)
-      if contribution.new_record?
-        contribution.color = color
-        contribution.contribution_count = contribution_count
-        contribution.save!
+      # 先週のデータを抽出、nilエラーを防ぐためdigを使用
+      data_of_last_week = response_body.dig("data", "user", "contributionsCollection", "contributionCalendar", "weeks", -1, "contributionDays")
+      data_of_last_week&.each do | data_of_day |
+        # 各データにはその日の日付、色（草の色）、コントリビューション数が入っている。
+        date, color, contribution_count = data_of_day.values_at("date", "color", "contributionCount")
+
+        # テーブルへの保存、重複回避のためにfind_or_initializeを使用し、レコードが新しいか確認
+        contribution = user.git_hub_contributions.find_or_initialize_by(user_id: user.id, date: date)
+        if contribution.new_record?
+          contribution.color = color
+          contribution.contribution_count = contribution_count
+          contribution.save!
+        # 新たなレコードじゃ無いかつ変更があれば更新
+        elsif contribution.color != color || contribution.contribution_count != contribution_count
+          contribution.update!(color: color, contribution_count: contribution_count)
+        end
       end
       puts "インポート完了"
     rescue => e
