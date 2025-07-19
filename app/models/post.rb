@@ -16,7 +16,6 @@ class Post < ApplicationRecord
     ["user", "tags"]
   end
 
-  has_rich_text :content
   has_one_attached :thumbnail
 
   belongs_to :user

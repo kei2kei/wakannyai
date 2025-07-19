@@ -2,7 +2,7 @@
 <% if @post.thumbnail.attached? %>
   <%= image_tag @post.thumbnail.variant(resize_to_limit: [200, 100]), alt: @post.title %>
 <% end %>
-<p>内容：<%= @post.content %></p>
+<p>内容：<%= rendered_content_html(@post.content) %></p>
 <p>投稿者：<%= @post.user.name %></p>
 <% if @post.tags.any? %>
   <p>タグ：<%= @post.tags.map(&:name).join(', ') %></p>
