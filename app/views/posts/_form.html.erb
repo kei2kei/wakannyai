@@ -5,11 +5,14 @@
     <%= f.text_field :title %>
     <%= f.label :content %>
     <%= f.text_area :content %>
-    <%= f.label :tag_names, "タグ" %>
-    <div data-controller="tag-suggest" data-tag-suggest-search-url="<%= tags_search_path %>">
-    <%= f.text_field :tag_names, data: { "tag-suggest-target": "input", "action": "input->tag-suggest#searchTags" }, value: post.tags.map(&:name).join(', ') %>
-    <select id="tagList" data-tag-suggest-target="searchResult">
-    </select>
+    <div data-controller="tag-manager" data-tag-manager-search-url="<%= tags_search_path %>">
+      <%= f.label :tag_names, "タグ" %>
+      <div data-tag-manager-target="tagListContainer" >
+      </div>
+      <%= f.text_field :tag_input, data: { "tag-manager-target": "input", action: "input->tag-manager#searchTags blur->tag-manager#addTagFromInput" }, placeholder: "新たなタグを入力" %>
+      <select id="tagList" data-tag-manager-target="searchResult" data-action="change->tag-manager#selectTag" >
+      </select>
+      <%= f.hidden_field :tag_names, data: { "tag-manager-target": "hiddenInput" }, value: post.tags.map(&:name).join(', ')%>
     </div>
     <%= f.submit post.new_record? ? '投稿する' : '更新する' %>
   <% end %>
