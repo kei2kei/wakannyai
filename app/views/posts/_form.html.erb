@@ -1,11 +1,15 @@
-<%= form_with model: post do |f| %>
-  <%= f.label :thumbnail, "サムネイル画像" %>
-  <%= f.file_field :thumbnail %>
-  <%= f.label :title %>
-  <%= f.text_field :title %>
-  <%= f.label :content %>
-  <%= f.text_area :content %>
-  <%= f.label :tag_names, "タグ" %>
-  <%= f.text_field :tag_names, value: post.tags.map(&:name).join(', ') %>
-  <%= f.submit post.new_record? ? '投稿する' : '更新する' %>
-<% end %>
+  <%= form_with model: post do |f| %>
+    <%= f.label :thumbnail, "サムネイル画像" %>
+    <%= f.file_field :thumbnail %>
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+    <%= f.label :content %>
+    <%= f.text_area :content %>
+    <%= f.label :tag_names, "タグ" %>
+    <div data-controller="tag-suggest" data-tag-suggest-search-url="<%= tags_search_path %>">
+    <%= f.text_field :tag_names, data: { "tag-suggest-target": "input", "action": "input->tag-suggest#searchTags" }, value: post.tags.map(&:name).join(', ') %>
+    <select id="tagList" data-tag-suggest-target="searchResult">
+    </select>
+    </div>
+    <%= f.submit post.new_record? ? '投稿する' : '更新する' %>
+  <% end %>
