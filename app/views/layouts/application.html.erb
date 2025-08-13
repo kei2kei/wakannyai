@@ -10,24 +10,15 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
-
-  <header>
-    <nav>
-    <ul>
-      <% if logged_in? %>
-        <li><%= link_to 'ログアウト', logout_path, data: { turbo_method: :delete } %></li>
-      <% else %>
-        <li><%= link_to 'ログイン', login_path %></li>
-      <% end %>
-    </ul>
-  </nav>
-  </header>
   <body>
-    <% flash.each do |message_type, message| %>
-      <div class="alert alert-<%= message_type %>">
-        <%= message %>
-      </div>
-    <% end %>
-    <%= yield %>
+    <%= render 'layouts/header' %>
+    <main>
+      <% flash.each do |message_type, message| %>
+        <div class="alert alert-<%= message_type %>">
+          <%= message %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
   </body>
 </html>
