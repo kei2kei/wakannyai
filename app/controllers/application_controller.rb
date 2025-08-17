@@ -1,10 +1,6 @@
 class ApplicationController < ActionController::Base
-  before_action :user_signed_in?
+  before_action :authenticate_user!
   before_action :configure_permitted_parameters, if: :devise_controller?
-
-  def not_authenticated
-    redirect_to login_path, alert: "ログインしてください。"
-  end
 
   protected
 
