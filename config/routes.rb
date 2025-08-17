@@ -1,8 +1,5 @@
 Rails.application.routes.draw do
   devise_for :users
-  get 'user_sessions/new'
-  get 'user_sessions/create'
-  get 'user_sessions/destroy'
   resources :posts, only: %i[new create edit update show destroy]
   root 'posts#index'
   get 'tags/search', to: 'tags#search'
