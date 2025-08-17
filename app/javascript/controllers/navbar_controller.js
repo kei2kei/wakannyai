@@ -7,7 +7,6 @@ export default class extends Controller {
   }
 
   toggleMenu() {
-    console.log('aaa')
     this.menuTarget.classList.toggle("hidden")
     this.menuTarget.classList.toggle("translate-x-full")
   }
