@@ -3,15 +3,23 @@ require "json"
 require "json/add/core"
 require "open-uri"
 require "uri"
+require "date"
 
 namespace :github do
   desc "Github上からコントリビューションのデータをインポート"
   task import_contributions: :environment do
     user = User.first
+    end_date = Time.current
+    start_date = end_date.ago(6.days)
+    query_variables = {
+      username: "kei2kei",
+      from: start_date.beginning_of_day.iso8601,
+      to: end_date.end_of_day.iso8601
+    }
     query = <<~GRAPHQL
-      query {
-        user(login: "kei2kei") {
-          contributionsCollection {
+      query($username: String!, $from: DateTime!, $to: DateTime!) {
+        user(login: $username) {
+          contributionsCollection(from: $from, to: $to) {
             contributionCalendar {
               weeks {
                 contributionDays {
@@ -39,14 +47,18 @@ namespace :github do
     }
     begin
       request = Net::HTTP::Post.new(uri.request_uri, request_header)
-      request.body = JSON.generate({ query: query })
+      request.body = JSON.generate({ query: query, variables: query_variables })
 
       response = https.request(request)
       response_body = JSON.parse(response.body)
-
+      p response_body
       # 先週のデータを抽出、nilエラーを防ぐためdigを使用
-      data_of_last_week = response_body.dig("data", "user", "contributionsCollection", "contributionCalendar", "weeks", -1, "contributionDays")
-      data_of_last_week&.each do | data_of_day |
+      data_of_weeks = response_body.dig("data", "user", "contributionsCollection", "contributionCalendar", "weeks")
+      data_of_seven_days = []
+      data_of_weeks&.each do |data_of_week|
+        data_of_seven_days.concat(data_of_week.dig("contributionDays"))
+      end
+      data_of_seven_days&.each do | data_of_day |
         # 各データにはその日の日付、色（草の色）、コントリビューション数が入っている。
         date, color, contribution_count = data_of_day.values_at("date", "color", "contributionCount")
 

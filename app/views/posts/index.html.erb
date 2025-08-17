@@ -1,43 +1,67 @@
-<div class="contribution-calendar">
-  <ul class="week-days">
-    <div>日</div>
-    <div>月</div>
-    <div>火</div>
-    <div>水</div>
-    <div>木</div>
-    <div>金</div>
-    <div>土</div>
-  </ul>
-  <div class="contribution-grid">
-    <% @git_hub_contributions.each do |contribution| %>
-      <div class="contribution-day" style="background-color: <%= contribution.color %>;">
-        <%= contribution.contribution_count %>
-        <%= contribution.date.day %>
-      </div>
-    <% end %>
+<section class="text-gray-600 body-font">
+  <div class="container mx-auto flex flex-col px-5 py-24 justify-center items-center">
+    <img class="lg:w-2/6 md:w-3/6 w-5/6 mb-10 object-cover object-center rounded" alt="hero" src="https://dummyimage.com/720x600">
   </div>
-</div>
-<%= render 'search_form' %>
-<% @posts.each do |post| %>
-  <div>
-    <% if post.is_note_article? && post.note_thumbnail_url.present? %>
-      <div class="note-thumbnail">
-        <%= image_tag post.note_thumbnail_url, alt: post.title, style: "max-width: 150px; height: auto; margin-right: 10px;" %>
-      </div>
-    <% elsif !post.is_note_article? && post.thumbnail.attached? %>
-      <div class="post-thumbnail">
-        <%= image_tag post.thumbnail.variant(resize_to_limit: [150, 150]), alt: post.title %>
-      </div>
-    <% end %>
+</section>
+<section class="text-gray-600 body-font">
+  <div class="container px-5 py-24 mx-auto">
+    <p class="text-xl mt-2 text-gray-500 mb-8 w-full">Githubカレンダー</p>
+    <div class="flex flex-wrap -mx-4 -my-8 bg-white bg-opacity-75 rounded-2xl">
+      <% @git_hub_contributions.each do |contribution| %>
+        <div class="py-8 px-4 lg:w-1/7 md:w-1/2 w-full border-r border-gray-200">
+          <div class="h-full flex items-start">
+            <div class="flex-grow">
+              <h2 class="tracking-widest text-xs title-font font-medium text-gray-500 mb-1 border-b-2 border-gray-200"><%= contribution.date.strftime("%b") %></h2>
+              <h1 class="title-font text-xl font-medium text-gray-900 mb-3"><%= contribution.date.day %></h1>
+              <%# <p class="leading-relaxed mb-5">Photo booth fam kinfolk cold-pressed sriracha leggings jianbing microdosing tousled waistcoat.</p> %>
+              <a class="inline-flex items-center flex-wrap overflow-x-auto">
+                <% contribution.contribution_count.times do %>
+                  <img alt="blog" src="/assets/paw.png" class="w-8 h-8 rounded-full flex-shrink-0 object-cover object-center">
+                <% end %>
+              </a>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
   </div>
-  <div>
-    <%= link_to post.title, post_path(post) %>
-    <% if current_user && current_user.id == post.user_id %>
-      <span><%= link_to "削除", post_path(post), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %></span>
-    <% end %>
+</section>
+<section class="text-gray-600 body-font">
+  <div class="container px-5 pb-24 mx-auto flex flex-col justify-center items-center">
+    <div class="w-full md:w-2/3 flex flex-col items-center text-center">
+      <%= render 'search_form' %>
+    </div>
+    <div class="w-full md:w-2/3 flex flex-col items-center text-center">
+      <p class="text-2xl mt-8 text-gray-500 mb-8 w-full">あなたの学習記録</p>
+    </div>
+    <div class="flex flex-wrap -m-4">
+      <div class="lg:w-1/3 sm:w-1/2 p-4">
+        <div class="flex relative">
+          <img alt="gallery" class="absolute inset-0 w-full h-full object-cover object-center" src="https://dummyimage.com/600x360">
+          <div class="px-8 py-10 relative z-10 w-full border-4 border-gray-200 bg-white opacity-0 hover:opacity-100">
+            <h2 class="tracking-widest text-sm title-font font-medium text-green-500 mb-1">THE SUBTITLE</h2>
+            <h1 class="title-font text-lg font-medium text-gray-900 mb-3">Shooting Stars</h1>
+            <p class="leading-relaxed">Photo booth fam kinfolk cold-pressed sriracha leggings jianbing microdosing tousled waistcoat.</p>
+          </div>
+        </div>
+      </div>
+      <% @posts.each do |post| %>
+        <div class="lg:w-1/3 sm:w-1/2 p-4">
+          <div class="flex relative">
+            <% if post.is_note_article? && post.note_thumbnail_url.present? %>
+              <%= image_tag post.note_thumbnail_url, alt: post.title, class: "absolute inset-0 w-full h-full object-cover object-center" %>
+            <% elsif !post.is_note_article? && post.thumbnail.attached? %>
+              <%= image_tag post.thumbnail, size: "600x360", alt: post.title, class: "absolute inset-0 w-full h-full object-cover object-center" %>
+            <% end %>
+            <div class="px-8 py-10 relative z-10 w-full border-4 border-gray-200 bg-white opacity-0 hover:opacity-100">
+              <h2 class="tracking-widest text-sm title-font font-medium text-green-500 mb-1"><%= post.tags.map(&:name).join(',') %></h2>
+              <h1 class="title-font text-lg font-medium text-gray-900 mb-3"><%= link_to post.title, post_path(post) %></h1>
+              <p class="leading-relaxed"><%= post.content[0,50] %></p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      <%= paginate @posts, theme: 'bootstrap-5' %>
+    </div>
   </div>
-<% end %>
-<%= paginate @posts, theme: 'bootstrap-5' %>
-<% if current_user %>
-  <%= link_to "新規作成", new_post_path %>
-<% end %>
+</section>

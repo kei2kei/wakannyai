@@ -5,7 +5,7 @@ class PostsController < ApplicationController
     @posts = @q.result(distinct: true).includes(:post_tags, :tags).order(created_at: :desc).page params[:page]
     # 一覧画面のカレンダーに合わせ週初め（日曜）〜週終わり（土曜）までのコントリビューションのデータを取得
     today = Date.today
-    @git_hub_contributions = GitHubContribution.where(date: (today.beginning_of_week - 1)..(today.end_of_week - 1)).order(:date)
+    @git_hub_contributions = GitHubContribution.where(date: (today - 6)..(today)).order(:date)
   end
 
   def show
