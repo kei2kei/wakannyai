@@ -1,9 +1,10 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
   resources :posts, only: %i[new create edit update show destroy]
   root 'posts#index'
   get 'tags/search', to: 'tags#search'
-  get 'login', to: 'user_sessions#new', as: :login
-  post 'login', to: 'user_sessions#create'
-  delete 'logout', to:'user_sessions#destroy', as: :logout
+  devise_scope :user do
+    get 'sign_in', :to => 'devise/sessions#new', :as => :new_user_session
+    get 'sign_out', :to => 'devise/sessions#destroy', :as => :destroy_user_session
+  end
 end
