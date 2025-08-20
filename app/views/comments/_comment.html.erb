@@ -1,4 +1,7 @@
 <% comments.each do |comment| %>
   <p>回答者：<%= comment.user.name %></p>
   <p>内容：<%= comment.content %></p>
+  <% if current_user && current_user.id == comment.user.id %>
+    <p><%= link_to "削除", post_comment_path(post,comment), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %></p>
+  <% end%>
 <% end %>
