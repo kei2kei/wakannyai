@@ -2,13 +2,12 @@ class PostsController < ApplicationController
   def index
     @q = Post.ransack(params[:q])
     @posts = @q.result(distinct: true).includes(:post_tags, :tags).order(created_at: :desc).page params[:page]
-    # 一覧画面のカレンダーに合わせ週初め（日曜）〜週終わり（土曜）までのコントリビューションのデータを取得
-    today = Date.today
-    @git_hub_contributions = GitHubContribution.where(date: (today - 6)..(today)).order(:date)
   end
 
   def show
     @post = Post.find(params[:id])
+    @comment = Comment.new
+    @comments = @post.comments.includes(:user).order(created_at: :desc)
   end
 
   def new

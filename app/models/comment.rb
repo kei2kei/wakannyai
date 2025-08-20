@@ -1,4 +1,5 @@
 class Comment < ApplicationRecord
+  validates :content, presence: true, length: { maximum: 65_535 }
   belongs_to :post
   belongs_to :user
   belongs_to :parent_comment, class_name: 'Comment', optional: true
