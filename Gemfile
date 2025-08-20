@@ -46,7 +46,6 @@ gem "image_processing", "~> 1.2"
 gem 'activestorage', '~> 7.1'
 gem 'actiontext', '~> 7.1'
 gem "bcrypt"
-gem "sorcery"
 gem 'ransack'
 gem 'kaminari'
 gem 'bootstrap5-kaminari-views'
@@ -55,6 +54,10 @@ gem 'nokogiri', '~> 1.16'
 gem 'dotenv-rails'
 gem 'kramdown'
 gem "tailwindcss-rails"
+gem "devise"
+gem 'omniauth'
+gem 'omniauth-github'
+gem 'omniauth-rails_csrf_protection'
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

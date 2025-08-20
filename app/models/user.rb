@@ -1,11 +1,20 @@
 class User < ApplicationRecord
-  authenticates_with_sorcery!
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  devise :rememberable, :omniauthable, omniauth_providers: %i[github]
+
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :password, length: { minimum: 6 }, if: -> { new_record? || changes[:crypted_password] }
-  validates :password_confirmation, presence: true, if: -> { new_record? || changes[:crypted_password] }
-  validates :password, confirmation: true, if: -> { new_record? || changes[:crypted_password] }
 
   has_many :posts, dependent: :destroy
   has_many :git_hub_contributions, dependent: :destroy
+
+  private
+
+  def self.from_omniauth(auth)
+    find_or_create_by(provider: auth.provider, uid: auth.uid) do |user|
+      user.email = auth.info.email
+      user.name = auth.info.name
+    end
+  end
 end
