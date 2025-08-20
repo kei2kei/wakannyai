@@ -7,7 +7,7 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 
   has_many :posts, dependent: :destroy
-  has_many :git_hub_contributions, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
   private
 
