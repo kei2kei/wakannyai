@@ -5,24 +5,8 @@
 </section>
 <section class="text-gray-600 body-font">
   <div class="container px-5 py-24 mx-auto">
-    <p class="text-xl mt-2 text-gray-500 mb-8 w-full">Githubカレンダー</p>
     <div class="flex flex-wrap -mx-4 -my-8 bg-white bg-opacity-75 rounded-2xl">
-      <% @git_hub_contributions.each do |contribution| %>
-        <div class="py-8 px-4 lg:w-1/7 md:w-1/2 w-full border-r border-gray-200">
-          <div class="h-full flex items-start">
-            <div class="flex-grow">
-              <h2 class="tracking-widest text-xs title-font font-medium text-gray-500 mb-1 border-b-2 border-gray-200"><%= contribution.date.strftime("%b") %></h2>
-              <h1 class="title-font text-xl font-medium text-gray-900 mb-3"><%= contribution.date.day %></h1>
-              <%# <p class="leading-relaxed mb-5">Photo booth fam kinfolk cold-pressed sriracha leggings jianbing microdosing tousled waistcoat.</p> %>
-              <a class="inline-flex items-center flex-wrap overflow-x-auto">
-                <% contribution.contribution_count.times do %>
-                  <img alt="blog" src="/assets/paw.png" class="w-8 h-8 rounded-full flex-shrink-0 object-cover object-center">
-                <% end %>
-              </a>
-            </div>
-          </div>
-        </div>
-      <% end %>
+      
     </div>
   </div>
 </section>
@@ -48,11 +32,6 @@
       <% @posts.each do |post| %>
         <div class="lg:w-1/3 sm:w-1/2 p-4">
           <div class="flex relative">
-            <% if post.is_note_article? && post.note_thumbnail_url.present? %>
-              <%= image_tag post.note_thumbnail_url, alt: post.title, class: "absolute inset-0 w-full h-full object-cover object-center" %>
-            <% elsif !post.is_note_article? && post.thumbnail.attached? %>
-              <%= image_tag post.thumbnail, size: "600x360", alt: post.title, class: "absolute inset-0 w-full h-full object-cover object-center" %>
-            <% end %>
             <div class="px-8 py-10 relative z-10 w-full border-4 border-gray-200 bg-white opacity-0 hover:opacity-100">
               <h2 class="tracking-widest text-sm title-font font-medium text-green-500 mb-1"><%= post.tags.map(&:name).join(',') %></h2>
               <h1 class="title-font text-lg font-medium text-gray-900 mb-3"><%= link_to post.title, post_path(post) %></h1>
