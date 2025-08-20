@@ -1,0 +1,5 @@
+<%= form_with model: comment, url: post_comments_path(post) do |f| %>
+  <%= f.label :content %>
+  <%= f.text_area :content %>
+  <%= f.submit comment.new_record? ? '投稿する' : '更新する' %>
+<% end %>

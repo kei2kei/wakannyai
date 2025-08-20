@@ -1,0 +1,4 @@
+<% comments.each do |comment| %>
+  <p>回答者：<%= comment.user.name %></p>
+  <p>内容：<%= comment.content %></p>
+<% end %>
