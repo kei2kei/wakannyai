@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_20_041933) do
+ActiveRecord::Schema[7.1].define(version: 2025_08_23_082052) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -69,6 +69,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_20_041933) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "best_comment_id"
+    t.index ["best_comment_id"], name: "index_posts_on_best_comment_id"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
@@ -95,5 +97,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_20_041933) do
   add_foreign_key "comments", "users"
   add_foreign_key "post_tags", "posts"
   add_foreign_key "post_tags", "tags"
+  add_foreign_key "posts", "comments", column: "best_comment_id"
   add_foreign_key "posts", "users"
 end
