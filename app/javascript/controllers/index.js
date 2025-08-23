@@ -4,5 +4,7 @@ import { eagerLoadControllersFrom } from "@hotwired/stimulus-loading"
 eagerLoadControllersFrom("controllers", application)
 import TagManagerController from "./tag_manager_controller"
 import NavbarController from "./navbar_controller"
+import CommentController from "./comment_controller"
 application.register("tag_manager", TagManagerController)
 application.register("navbar", NavbarController)
+application.register("comment", CommentController)
