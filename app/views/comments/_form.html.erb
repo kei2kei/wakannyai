@@ -1,5 +1,8 @@
-<%= form_with model: comment, url: post_comments_path(post) do |f| %>
+<%= form_with model: comment, id: "reply-form-#{comment.parent_id}", class: "reply-form", url: post_comments_path(post) do |f| %>
   <%= f.label :content %>
   <%= f.text_area :content %>
-  <%= f.submit comment.new_record? ? '投稿する' : '更新する' %>
+  <% if parent_comment.present? %>
+    <%= f.hidden_field :parent_id, value: parent_comment.id %>
+  <% end %>
+  <%= f.submit '投稿する'%>
 <% end %>

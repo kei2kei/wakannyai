@@ -3,6 +3,11 @@ Rails.application.routes.draw do
   resources :posts, only: %i[new create edit update show destroy] do
     resources :comments, only: %i[create edit destroy]
   end
+  resources :comments, only: [:create] do
+    collection do
+      get :new_reply
+    end
+  end
   root 'posts#index'
   get 'tags/search', to: 'tags#search'
   devise_scope :user do
