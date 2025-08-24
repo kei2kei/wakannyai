@@ -8,6 +8,11 @@ Rails.application.routes.draw do
       get :new_reply
     end
   end
+  resources :comments, only: [] do
+    member do
+      patch :set_best_comment
+    end
+  end
   root 'posts#index'
   get 'tags/search', to: 'tags#search'
   devise_scope :user do
