@@ -33,11 +33,12 @@ class CommentsController < ApplicationController
 
   def set_best_comment
     @comment = Comment.find(params[:id])
-    if @comment.post.best_comment.present? || current_user != @comment.post.user
+    if @comment.post.best_comment.present? || current_user != @comment.post.user || @comment.post.user == @comment.user
       redirect_to post_path(@comment.post), alert: '権限がありません。'
     end
 
     @comment.post.update(best_comment: @comment)
+    @comment.user.increment!(:points, 5)
     redirect_to post_path(@comment.post), notice: 'ベストアンサーを選びました。'
   end
 

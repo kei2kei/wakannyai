@@ -45,5 +45,10 @@
         </div>
       </div>
     </div>
+
+    <% if current_user %>
+      <p><%= current_user.name %></p>
+      <p><%= current_user.points %></p>
+    <% end %>
   </div>
 </header>
