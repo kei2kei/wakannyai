@@ -8,7 +8,9 @@
   <p>タグ：<%= @post.tags.map(&:name).join(', ') %></p>
 <% end %>
 <%= render 'comments/form', comment: @comment, parent_comment: @parent_comment, post: @post %>
-<%= render 'comments/comment', comments: @comments, post: @post %>
+<% @comments.each do |comment| %>
+  <%= render 'comments/comment', comment: comment, post: @post %>
+<% end %>
 <% if current_user && current_user.id == @post.user_id %>
   <%= link_to "編集", edit_post_path(@post) %>
   <%= link_to "削除", post_path(@post), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %>

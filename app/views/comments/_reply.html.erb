@@ -1,10 +1,8 @@
-<% replies.each_with_index do |reply, index| %>
-  <div class="comment ml-40" data-controller="comment">
-    <p>回答者：<%= reply.user.name %></p>
-    <p>コメント：<%= reply.content %></p>
-    <% if current_user && current_user.id == reply.user.id %>
-      <p><%= link_to "削除", post_comment_path(post,reply), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %></p>
-    <% end%>
-    <button data-action="click->comment#showReplyForm" data-comment-id="<%= reply.id %>">返信</button>
-  </div>
-<% end %>
+<div class="comment ml-40" data-controller="comment">
+  <p>回答者：<%= reply.user.name %></p>
+  <p>コメント：<%= reply.content %></p>
+  <% if current_user && current_user.id == reply.user.id %>
+    <p><%= link_to "削除", post_comment_path(post,reply), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %></p>
+  <% end%>
+  <button data-action="click->comment#showReplyForm" data-comment-id="<%= reply.id %>">返信</button>
+</div>

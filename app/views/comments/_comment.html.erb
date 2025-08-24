@@ -1,15 +1,21 @@
-<% comments.each do |comment| %>
-  <div class="comment ml-20" data-controller="comment">
-    <p>回答者：<%= comment.user.name %></p>
-    <p>内容：<%= comment.content %></p>
-    <% if current_user && current_user.id == comment.user.id %>
-      <p><%= link_to "削除", post_comment_path(post,comment), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %></p>
-    <% end%>
-    <button data-action="click->comment#showReplyForm" data-comment-id="<%= comment.id %>">返信</button>
-    <% if comment.replies.any? %>
-      <div class="replies">
-        <%= render partial: 'comments/reply', locals: { replies: comment.replies, post: @post } %>
-      </div>
-    <% end %>
-  </div>
-<% end %>
+<div class="comment ml-20" data-controller="comment">
+  <% if post.best_comment_id == comment.id %>
+    <i>ベストアンサー</i>
+  <% end %>
+  <% if current_user == post.user && post.best_comment_id.nil? %>
+    <%= button_to "ベストアンサーに選ぶ", set_best_comment_comment_path(comment), method: :patch %>
+  <% end %>
+  <p>回答者：<%= comment.user.name %></p>
+  <p>内容：<%= comment.content %></p>
+  <% if current_user && current_user.id == comment.user.id %>
+    <p><%= link_to "削除", post_comment_path(post,comment), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %></p>
+  <% end%>
+  <button data-action="click->comment#showReplyForm" data-comment-id="<%= comment.id %>">返信</button>
+  <% if comment.replies.any? %>
+    <div class="replies">
+      <% comment.replies.each do |reply| %>
+        <%= render partial: 'comments/reply', locals: { reply: reply, post: post } %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

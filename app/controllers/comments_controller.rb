@@ -9,9 +9,17 @@ class CommentsController < ApplicationController
   end
 
   def destroy
-    comment = current_user.comments.find(params[:id])
-    comment.destroy
-    redirect_to post_path(comment.post)
+    @comment = current_user.comments.find(params[:id])
+    if @comment.post.best_comment_id == @comment.id
+      redirect_to post_path(@comment.post), alert: "ベストアンサーに選ばれたコメントは削除できません。"
+      return
+    end
+    if current_user == @comment.user
+      @comment.destroy
+      redirect_to post_path(@comment.post), notice: "コメントを削除しました。"
+    else
+      redirect_to post_path(@comment.post), alert: "権限がありません。"
+    end
   end
 
   def new_reply
@@ -21,6 +29,16 @@ class CommentsController < ApplicationController
     respond_to do |format|
       format.html { render partial: 'comments/form', locals: { comment: @comment, post: @post, parent_comment: @parent_comment } }
     end
+  end
+
+  def set_best_comment
+    @comment = Comment.find(params[:id])
+    if @comment.post.best_comment.present? || current_user != @comment.post.user
+      redirect_to post_path(@comment.post), alert: '権限がありません。'
+    end
+
+    @comment.post.update(best_comment: @comment)
+    redirect_to post_path(@comment.post), notice: 'ベストアンサーを選びました。'
   end
 
   private
