@@ -1,6 +1,9 @@
 Rails.application.routes.draw do
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
   resources :posts, only: %i[new create edit update show destroy] do
+    member do
+      patch :solve # PATCH /posts/:id/solve
+    end
     resources :comments, only: %i[create edit destroy]
   end
   resources :comments, only: [:create] do

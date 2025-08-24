@@ -15,7 +15,7 @@ class PostsController < ApplicationController
   end
 
   def edit
-    @post = find_post(params[:id])
+    @post = Post.find(params[:id])
   end
 
   def create
@@ -29,7 +29,7 @@ class PostsController < ApplicationController
   end
 
   def update
-    @post = find_post(params[:id])
+    @post = Post.find(params[:id])
     if @post.update(post_params)
       redirect_to post_path(@post.id)
     else
@@ -38,16 +38,23 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    post = find_post(params[:id])
+    post = Post.find(params[:id])
     post.destroy
     redirect_to root_path
   end
 
-  private
-
-  def find_post(id)
-    current_user.posts.find(id)
+  def solve
+    @post = Post.find(params[:id])
+    if current_user == @post.user && @post.unsolved?
+      @post.solved!
+      current_user.increment!(:points, 2)
+      redirect_to post_path(@post), success: '解決おめでとうございます。'
+    else
+      redirect_to @post, alert: '解決済みにできません。'
+    end
   end
+
+  private
 
   def post_params
     params.require(:post).permit(:title, :content, :tag_names)
