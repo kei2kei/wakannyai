@@ -1,4 +1,5 @@
 <h3>タイトル：<%= @post.title %></h3>
+<p>ステータス：<%= @post.unsolved? ? '未解決' : '解決済み' %></p>
 <p>内容：<%= rendered_content_html(@post.content) %></p>
 <p>投稿者：<%= @post.user.name %></p>
 <% if @post.tags.any? %>
@@ -11,5 +12,8 @@
 <% if current_user && current_user.id == @post.user_id %>
   <%= link_to "編集", edit_post_path(@post) %>
   <%= link_to "削除", post_path(@post), data: { turbo_method: :delete, confirm: "本当に削除しますか？" } %>
+  <% if @post.unsolved? %>
+    <%= button_to "解決した", solve_post_path(@post), method: :patch, data: { confirm: 'この問題を解決済みにしますか？' } %>
+  <% end %>
 <% end%>
 <%= link_to "戻る", root_path %>

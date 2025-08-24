@@ -1,6 +1,7 @@
 class Post < ApplicationRecord
   validates :title, presence: true, length: { maximum: 255 }
   validates :content, presence: true, length: { maximum: 65_535 }
+  enum status: { unsolved: 0, solved: 1 }
 
   attr_accessor :tag_names
   before_save :save_tags
