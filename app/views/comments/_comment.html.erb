@@ -2,7 +2,7 @@
   <% if post.best_comment_id == comment.id %>
     <i>ベストアンサー</i>
   <% end %>
-  <% if current_user == post.user && post.best_comment_id.nil? %>
+  <% if current_user == post.user && post.best_comment_id.nil? && comment.user != post.user %>
     <%= button_to "ベストアンサーに選ぶ", set_best_comment_comment_path(comment), method: :patch %>
   <% end %>
   <p>回答者：<%= comment.user.name %></p>
