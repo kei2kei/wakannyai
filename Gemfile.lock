@@ -165,6 +165,8 @@ GEM
     kaminari-core (1.2.2)
     kramdown (2.5.1)
       rexml (>= 3.3.9)
+    kramdown-parser-gfm (1.1.0)
+      kramdown (~> 2.0)
     logger (1.7.0)
     loofah (2.24.1)
       crass (~> 1.0.2)
@@ -365,6 +367,7 @@ DEPENDENCIES
   jbuilder
   kaminari
   kramdown
+  kramdown-parser-gfm
   nokogiri (~> 1.16)
   omniauth
   omniauth-github

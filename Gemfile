@@ -53,6 +53,7 @@ gem 'rss'
 gem 'nokogiri', '~> 1.16'
 gem 'dotenv-rails'
 gem 'kramdown'
+gem 'kramdown-parser-gfm'
 gem "tailwindcss-rails"
 gem "devise"
 gem 'omniauth'
