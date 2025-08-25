@@ -1,6 +1,8 @@
 <h3>タイトル：<%= @post.title %></h3>
 <p>ステータス：<%= @post.unsolved? ? '未解決' : '解決済み' %></p>
-<p>内容：<%= rendered_content_html(@post.content) %></p>
+<div class="prose">
+  <p>内容：<%= rendered_content_html(@post.content) %></p>
+</div>
 <p>投稿者：<%= @post.user.name %></p>
 <% if @post.tags.any? %>
   <p>タグ：<%= @post.tags.map(&:name).join(', ') %></p>

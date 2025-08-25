@@ -1,8 +1,12 @@
   <%= form_with model: post do |f| %>
     <%= f.label :title %>
     <%= f.text_field :title %>
-    <%= f.label :content %>
-    <%= f.text_area :content %>
+    <div class="field">
+      <%= f.label :content, "内容" %>
+      <%= f.text_area :content,
+      id: 'markdown-editor',
+      class: 'form-control' %>
+    </div>
     <div data-controller="tag-manager" data-tag-manager-search-url="<%= tags_search_path %>">
       <%= f.label :tag_names, "タグ" %>
       <div data-tag-manager-target="tagListContainer" >
