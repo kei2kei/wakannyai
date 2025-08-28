@@ -10,7 +10,14 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
       <!-- エディタ側 -->
       <div class="space-y-2">
-        <%= f.label :content, class: "block text-sm font-medium text-gray-700" %>
+        <div class="flex justify-between mb-4">
+          <%= f.label :content, class: "block text-sm font-medium text-gray-700" %>
+          <button type="button"
+                  class="px-4 py-2 font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                  data-action="click->markdown-editor#insertTemplate">
+            テンプレートを挿入
+          </button>
+        </div>
         <%= f.text_area :content,
             id: "markdown-editor",
             class: "w-full",
@@ -22,7 +29,7 @@
         <label class="block text-sm font-medium text-gray-700">
           プレビュー
         </label>
-        <div id="preview-container" class="border border-gray-300 rounded-lg bg-white p-6 min-h-[500px] max-h-[600px] overflow-y-auto shadow-sm">
+        <div id="preview-container" class="border border-gray-300 rounded-lg bg-white p-6 min-h-[500px] max-h-[600px] overflow-y-auto shadow-sm mt-20">
           <p class="text-gray-500 italic">ここに内容のプレビューが表示されます</p>
         </div>
       </div>
