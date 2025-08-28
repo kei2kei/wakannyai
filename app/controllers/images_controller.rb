@@ -1,12 +1,9 @@
 class ImagesController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:upload]
   def upload
-    # JavaScriptのFormData.append('image', file) に合わせる
     uploaded_file = params[:image]
 
     if uploaded_file.present?
       begin
-        # Active Storageのcreate_and_upload!メソッドを使用してファイルを安全に保存
         blob = ActiveStorage::Blob.create_and_upload!(
           io: uploaded_file.open,
           filename: uploaded_file.original_filename,
