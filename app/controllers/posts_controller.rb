@@ -21,9 +21,11 @@ class PostsController < ApplicationController
   def create
     @post = current_user.posts.build(post_params)
     if @post.save
+      purge_images if params[:post][:purged_image_ids]
       current_user.increment!(:points, 1)
       redirect_to root_path
     else
+      @unattached_blobs = find_unattached_blobs
       render :new, status: :unprocessable_entity
     end
   end
@@ -31,8 +33,11 @@ class PostsController < ApplicationController
   def update
     @post = Post.find(params[:id])
     if @post.update(post_params)
+      # formのパージ用隠しフィールドに入ってるものは削除
+      purge_images if params[:post][:purged_image_ids]
       redirect_to post_path(@post.id)
     else
+      @unattached_blobs = find_unattached_blobs
       render :edit, status: :unprocessable_entity
     end
   end
@@ -58,5 +63,27 @@ class PostsController < ApplicationController
 
   def post_params
     params.require(:post).permit(:title, :content, :tag_names, images: [])
+  end
+
+  def purge_images
+    purged_ids = params[:post][:purged_image_ids]
+
+    purged_ids.each do |signed_id|
+      blob = ActiveStorage::Blob.find_signed(signed_id)
+      blob&.purge
+    end
+  end
+
+  def find_unattached_blobs
+    return [] unless params[:post][:images]
+    blobs = ActiveStorage::Blob.find_signed(params[:post][:images])
+
+    blobs.compact.map do |blob|
+      {
+        id: blob.id,
+        url: url_for(blob),
+        signed_id: blob.signed_id
+      }
+    end
   end
 end

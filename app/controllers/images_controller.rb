@@ -10,14 +10,33 @@ class ImagesController < ApplicationController
           content_type: uploaded_file.content_type
         )
 
-        # 保存した画像のURLをActive Storageのヘルパーで取得し、JSONで返す
-        render json: { url: url_for(blob) }, status: :created
+        render json: {
+          url: url_for(blob),
+          blob_id: blob.id,
+          signed_id: blob.signed_id
+        }, status: :created
       rescue => e
         Rails.logger.error "Image upload failed: #{e.message}"
         render json: { error: 'Image upload failed' }, status: :internal_server_error
       end
     else
       render json: { error: 'No file provided' }, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    begin
+      blob = ActiveStorage::Blob.find_by(id: params[:id])
+
+      if blob
+        blob.purge
+        head :no_content
+      else
+        head :not_found
+      end
+    rescue => e
+      Rails.logger.error "Image deletion failed: #{e.message}"
+      render json: { error: 'Image deletion failed' }, status: :internal_server_error
     end
   end
 end

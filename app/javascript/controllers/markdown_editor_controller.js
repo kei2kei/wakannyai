@@ -1,102 +1,87 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static easyMDE;
+  // サーバーから渡された未添付のBlob情報を受け取るためのValue
+  static values = {
+    unattachedBlobs: Array
+  };
 
   connect() {
     console.log('🚀 Stimulus Controller Connected');
 
+    this.form = this.element.querySelector('form');
     const textareaElement = this.element.querySelector('#markdown-editor');
-    const previewContainer = this.element.querySelector('#preview-container');
+    this.previewContainer = this.element.querySelector('#preview-container');
 
-    if (textareaElement && previewContainer && typeof EasyMDE !== 'undefined' && typeof marked !== 'undefined') {
-      const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
-      this.csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : null;
-
-      if (!this.csrfToken) {
-        console.error("❌ CSRFトークンが見つかりません。");
-        return;
-      }
-      
-      marked.setOptions({
-        breaks: true,
-        gfm: true,
-        renderer: this.createMarkdownRenderer()
-      });
-      
-      // クラスのプロパティとしてEasyMDEインスタンスを保持
-      this.easyMDE = new EasyMDE({
-        element: textareaElement,
-        spellChecker: false,
-        status: false,
-        placeholder: "Markdownで記事を書いてください...",
-        previewRender: (plainText) => marked.parse(plainText),
-        toolbar: [
-          "bold", "italic", "strikethrough", "heading", "|",
-          "quote", "unordered-list", "ordered-list", "|",
-          "link", 
-          "|",
-          "code", "table", "horizontal-rule", "|",
-          {
-            name: "upload-image",
-            action: (editor) => this.triggerFileUpload(editor),
-            className: "fa fa-upload",
-            title: "画像をアップロード"
-          },
-          "|",
-          "fullscreen"
-        ],
-        autosave: { enabled: false }
-      });
-
-      
-      this.easyMDE.codemirror.on('change', () => this.updatePreview(this.easyMDE.value()));
-      this.easyMDE.codemirror.getWrapperElement().addEventListener('drop', (e) => this.handleDrop(e));
-      this.easyMDE.codemirror.getWrapperElement().addEventListener('paste', (e) => this.handlePaste(e));
-
-      this.updatePreview(this.easyMDE.value());
-    } else {
-      console.error('❌ 必要な要素またはライブラリが読み込まれていません');
-    }
-  }
-
-  updatePreview(markdownText) {
-    const previewContainer = this.element.querySelector('#preview-container');
-    if (!markdownText.trim()) {
-      previewContainer.innerHTML = '<p class="text-gray-500">プレビューがここに表示されます</p>';
+    if (!this.form || !textareaElement || !this.previewContainer) {
+      console.error("❌ フォーム、テキストエリア、またはプレビューコンテナが見つかりません。");
       return;
     }
-    previewContainer.innerHTML = marked.parse(markdownText);
+
+    const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
+    this.csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : null;
+
+    // バリデーションエラーによる再描画時に、サーバーから渡された情報で状態を復元します
+    this.uploadedBlobs = this.hasUnattachedBlobsValue ? [...this.unattachedBlobsValue] : [];
+
+    this.initEasyMDE(textareaElement);
+
+    this.updatePreview(textareaElement.value);
   }
 
-  handleDrop(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    const files = Array.from(e.dataTransfer.files);
-    files.forEach(file => {
-      if (file.type.startsWith('image/')) {
-        this.handleImageUpload(file);
-      }
+  initEasyMDE(textareaElement) {
+    const renderer = new marked.Renderer();
+    // デフォルトでMarkdownの画像を認識しないためrendererを定義
+    renderer.image = (href, title, text) => {
+      const titleAttr = title ? ` title="${title}"` : '';
+      return `<img src="${href}" alt="${text}"${titleAttr} style="max-width: 100%; height: auto;" />`;
+    };
+    marked.setOptions({
+      breaks: true,
+      gfm: true,
+      renderer: renderer,
+    });
+
+    this.easyMDE = new EasyMDE({
+      element: textareaElement,
+      spellChecker: false,
+      status: false,
+      placeholder: "Markdownで記事を書いてください...",
+      previewRender: (plainText) => marked.parse(plainText),
+      toolbar: [
+        "bold", "italic", "strikethrough", "heading", "|", "quote", "unordered-list", "ordered-list", "|",
+        "link", "|", "code", "table", "horizontal-rule", "|",
+        {
+          name: "upload-image",
+          action: () => this.triggerFileUpload(),
+          className: "fa fa-upload",
+          title: "画像をアップロード",
+        },
+        "|", "fullscreen",
+      ],
+      autosave: { enabled: false }
+    });
+
+    const wrapper = this.easyMDE.codemirror.getWrapperElement();
+    wrapper.addEventListener('drop', (e) => this.handleDrop(e));
+    wrapper.addEventListener('paste', (e) => this.handlePaste(e));
+    // プレビューの同期&隠しフィールドの同期
+    this.easyMDE.codemirror.on('change', () => {
+      const markdownText = this.easyMDE.value();
+      this.updatePreview(markdownText);
+      this.syncHiddenFields(markdownText);
     });
   }
 
-  handlePaste(e) {
-    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-    if (items) {
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].type.startsWith('image/')) {
-          const file = items[i].getAsFile();
-          if (file) {
-            e.preventDefault(); // デフォルトの貼り付けを防ぐ
-            this.handleImageUpload(file);
-          }
-          break;
-        }
-      }
+  updatePreview(markdownText) {
+    if (!markdownText.trim()) {
+      this.previewContainer.innerHTML = '<p class="text-gray-500 italic">ここに内容のプレビューが表示されます</p>';
+      return;
     }
+    this.previewContainer.innerHTML = marked.parse(markdownText);
   }
 
-  triggerFileUpload(editor) {
+  triggerFileUpload() {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -107,53 +92,100 @@ export default class extends Controller {
     input.click();
   }
 
-  handleImageUpload(file) {
-    const uploadingText = `![アップロード中...](🔄 ${file.name})`;
-    this.easyMDE.codemirror.replaceSelection(uploadingText);
-    
-    const formData = new FormData();
-    formData.append('image', file);
-    
-    fetch("/api/upload-image", {
-      method: 'POST',
-      body: formData,
-      headers: {
-        "X-CSRF-Token": this.csrfToken
-      }
-    })
-    .then(response => {
-      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      return response.json();
-    })
-    .then(data => {
-      const currentText = this.easyMDE.value();
-      if (data.url) {
-        const updatedText = currentText.replace(uploadingText, `![${file.name}](${data.url})`);
-        this.easyMDE.value(updatedText);
-      } else {
-        this.handleUploadError(file.name, `サーバーレスポンスにurlキーがありません。`);
-      }
-    })
-    .catch(error => {
-      this.handleUploadError(file.name, error.message);
+  handleDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = Array.from(e.dataTransfer?.files || []);
+    files.forEach(file => {
+      if (file.type.startsWith('image/')) this.handleImageUpload(file);
     });
   }
 
-  handleUploadError(filename, errorMessage) {
+  handlePaste(e) {
+    const items = (e.clipboardData || e.originalEvent.clipboardData)?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          e.preventDefault();
+          this.handleImageUpload(file);
+        }
+        break;
+      }
+    }
+  }
+
+  handleImageUpload(file) {
+    const uploadingText = `![アップロード中...](Uploading ${file.name}...)`;
+    this.easyMDE.codemirror.replaceSelection(uploadingText);
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    fetch("/api/upload-image", {
+      method: 'POST',
+      body: formData,
+      headers: { "X-CSRF-Token": this.csrfToken }
+    })
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      return response.json();
+    })
+    .then(data => {
+      if (data.url && data.signed_id && data.blob_id) {
+        const markdownImage = `![${file.name}](${data.url})`;
+        const currentText = this.easyMDE.value().replace(uploadingText, markdownImage);
+        this.easyMDE.value(currentText);
+
+        this.uploadedBlobs.push({
+          id: data.blob_id,
+          url: data.url,
+          signed_id: data.signed_id
+        });
+        this.syncHiddenFields(this.easyMDE.value());
+      } else {
+        throw new Error("サーバーからのレスポンスが不正です。");
+      }
+    })
+    .catch(error => this.handleUploadError(uploadingText, error.message));
+  }
+
+  handleUploadError(uploadingText, errorMessage) {
     console.error('❌ アップロードエラー:', errorMessage);
-    const currentText = this.easyMDE.value();
-    const updatedText = currentText.replace(`![アップロード中...](🔄 ${filename})`, '');
-    this.easyMDE.value(updatedText);
+    const currentText = this.easyMDE.value().replace(uploadingText, '');
+    this.easyMDE.value(currentText);
     alert(`画像のアップロードに失敗しました:\n${errorMessage}`);
   }
 
-  // helper for marked.js
-  createMarkdownRenderer() {
-    const renderer = new marked.Renderer();
-    renderer.image = function(href, title, text) {
-      const titleAttr = title ? ` title="${title}"` : '';
-      return `<img src="${href}" alt="${text}"${titleAttr} style="max-width: 100%; height: auto;" />`;
-    };
-    return renderer;
+  syncHiddenFields(currentText) {
+    // エディタ本文内の画像と隠しフィールドの画像を比較
+    this.uploadedBlobs.forEach(blob => {
+      const isPresentInText = currentText.includes(blob.url);
+      const imageField = this.findHiddenField("post[images][]", blob.signed_id);
+      const purgedField = this.findHiddenField("post[purged_image_ids][]", blob.signed_id);
+
+      if (isPresentInText) {
+        // 本文にある場合は隠しアップロード用フィールドに追加
+        if (!imageField) this.addHiddenField("post[images][]", blob.signed_id);
+        if (purgedField) purgedField.remove();
+      } else {
+        // 本文内に無い場合は削除用隠しフィールドに追加
+        if (imageField) imageField.remove();
+        if (!purgedField) this.addHiddenField("post[purged_image_ids][]", blob.signed_id);
+      }
+    });
+  }
+
+  addHiddenField(name, value) {
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = name;
+    input.value = value;
+    this.form.appendChild(input);
+  }
+
+  findHiddenField(name, value) {
+    return this.form.querySelector(`input[type="hidden"][name="${name}"][value="${value}"]`);
   }
 }

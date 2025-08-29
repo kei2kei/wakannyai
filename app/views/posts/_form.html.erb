@@ -1,4 +1,6 @@
-<div class="container mx-auto px-4 py-8 max-w-7xl" data-controller="markdown-editor">
+<% unattached_blobs_json = (@unattached_blobs || []).to_json %>
+
+<div class="container mx-auto px-4 py-8 max-w-7xl" data-controller="markdown-editor" data-markdown-editor-unattached-blobs-value="<%= unattached_blobs_json %>">
   <%= form_with model: @post, local: true do |f| %>
     <!-- タイトル入力 -->
     <div class="mb-6">
@@ -27,6 +29,12 @@
         </div>
       </div>
     </div>
+
+    <% if @unattached_blobs %>
+      <% @unattached_blobs.each do |blob| %>
+        <input type="hidden" name="post[images][]" value="<%= blob[:signed_id] %>">
+      <% end %>
+    <% end %>
 
     <div class="flex justify-end">
       <%= f.submit "保存", class: "px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200" %>
