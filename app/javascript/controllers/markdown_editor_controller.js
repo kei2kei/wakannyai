@@ -188,4 +188,9 @@ export default class extends Controller {
   findHiddenField(name, value) {
     return this.form.querySelector(`input[type="hidden"][name="${name}"][value="${value}"]`);
   }
+
+  insertTemplate() {
+    const templateText = '## 問題\n\n\n\n## 試したこと\n\n\n\n## 期待する結果\n\n\n\n## 解決方法\n\n\n\n## まとめ';
+    this.easyMDE.codemirror.replaceSelection(templateText);
+  }
 }
