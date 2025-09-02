@@ -1,11 +1,12 @@
 class PostsController < ApplicationController
+  before_action :set_post, only: [:show, :edit, :update, :destroy, :solve, :sync_to_github]
+
   def index
     @q = Post.ransack(params[:q])
     @posts = @q.result(distinct: true).includes(:post_tags, :tags).order(created_at: :desc).page params[:page]
   end
 
   def show
-    @post = Post.find(params[:id])
     @comment = @post.comments.new
     @comments = @post.comments.where(parent_id: nil).includes(:replies)
   end
@@ -15,7 +16,6 @@ class PostsController < ApplicationController
   end
 
   def edit
-    @post = Post.find(params[:id])
   end
 
   def create
@@ -31,7 +31,6 @@ class PostsController < ApplicationController
   end
 
   def update
-    @post = Post.find(params[:id])
     if @post.update(post_params)
       # formのパージ用隠しフィールドに入ってるものは削除
       purge_images if params[:post][:purged_image_ids]
@@ -43,8 +42,7 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    post = Post.find(params[:id])
-    post.destroy
+    @post.destroy
     redirect_to root_path
   end
 
@@ -59,7 +57,28 @@ class PostsController < ApplicationController
     end
   end
 
+  def sync_to_github
+    service = GithubService.new(current_user)
+
+    unless service.can_sync?
+      redirect_to @post, alert: 'GitHub連携を設定してください'
+      return
+    end
+
+    result = service.sync_post(@post)
+
+    if result[:success]
+      redirect_to @post, notice: 'GitHubに同期しました！'
+    else
+      redirect_to @post, alert: "同期に失敗しました: #{result[:error]}"
+    end
+  end
+
   private
+
+  def set_post
+    @post = current_user.posts.find(params[:id])
+  end
 
   def post_params
     params.require(:post).permit(:title, :content, :tag_names, images: [])

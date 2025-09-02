@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_24_115132) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_01_063459) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -71,6 +71,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_24_115132) do
     t.datetime "updated_at", null: false
     t.bigint "best_comment_id"
     t.integer "status", default: 0, null: false
+    t.string "github_url"
+    t.string "github_sha"
+    t.datetime "github_synced_at"
+    t.boolean "auto_sync_github"
     t.index ["best_comment_id"], name: "index_posts_on_best_comment_id"
     t.index ["status"], name: "index_posts_on_status"
     t.index ["user_id"], name: "index_posts_on_user_id"
@@ -91,6 +95,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_24_115132) do
     t.string "provider"
     t.string "uid"
     t.integer "points", default: 0, null: false
+    t.string "github_token"
+    t.string "github_username"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
