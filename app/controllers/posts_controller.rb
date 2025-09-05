@@ -23,6 +23,7 @@ class PostsController < ApplicationController
     if @post.save
       purge_images if params[:post][:purged_image_ids]
       current_user.increment!(:points, 1)
+      current_user.cat.update_level
       redirect_to root_path
     else
       @unattached_blobs = find_unattached_blobs
@@ -50,7 +51,8 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     if current_user == @post.user && @post.unsolved?
       @post.solved!
-      current_user.increment!(:points, 2)
+      current_user.increment!(:points, 1)
+      current_user.cat.update_level
       redirect_to post_path(@post), success: '解決おめでとうございます。'
     else
       redirect_to @post, alert: '解決済みにできません。'
