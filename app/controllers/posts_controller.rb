@@ -23,6 +23,7 @@ class PostsController < ApplicationController
     if @post.save
       purge_images if params[:post][:purged_image_ids]
       current_user.increment!(:points, 1)
+      current_user.cat.update_level
       redirect_to root_path
     else
       @unattached_blobs = find_unattached_blobs
@@ -47,10 +48,10 @@ class PostsController < ApplicationController
   end
 
   def solve
-    @post = Post.find(params[:id])
     if current_user == @post.user && @post.unsolved?
       @post.solved!
-      current_user.increment!(:points, 2)
+      current_user.increment!(:points, 1)
+      current_user.cat.update_level
       redirect_to post_path(@post), success: '解決おめでとうございます。'
     else
       redirect_to @post, alert: '解決済みにできません。'
@@ -95,7 +96,9 @@ class PostsController < ApplicationController
 
   def find_unattached_blobs
     return [] unless params[:post][:images]
-    blobs = ActiveStorage::Blob.find_signed(params[:post][:images])
+    blobs = params[:post][:images].map do |image|
+      ActiveStorage::Blob.find_signed(image)
+    end
 
     blobs.compact.map do |blob|
       {

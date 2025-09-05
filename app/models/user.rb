@@ -8,6 +8,8 @@ class User < ApplicationRecord
 
   has_many :posts, dependent: :destroy
   has_many :comments, dependent: :destroy
+  has_one :cat, dependent: :destroy
+  after_create :assign_random_cat
 
   def github_client
     @github_client ||= Octokit::Client.new(access_token: github_token) if github_token.present?
@@ -34,5 +36,12 @@ class User < ApplicationRecord
         )
       end
     end
+  end
+
+  def assign_random_cat
+    colors = ['orange', 'calico', 'white', 'black']
+    random_color = colors.sample
+
+    Cat.create(user: self, color: random_color)
   end
 end
