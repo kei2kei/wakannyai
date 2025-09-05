@@ -48,7 +48,6 @@ class PostsController < ApplicationController
   end
 
   def solve
-    @post = Post.find(params[:id])
     if current_user == @post.user && @post.unsolved?
       @post.solved!
       current_user.increment!(:points, 1)
@@ -97,7 +96,9 @@ class PostsController < ApplicationController
 
   def find_unattached_blobs
     return [] unless params[:post][:images]
-    blobs = ActiveStorage::Blob.find_signed(params[:post][:images])
+    blobs = params[:post][:images].map do |image|
+      ActiveStorage::Blob.find_signed(image)
+    end
 
     blobs.compact.map do |blob|
       {

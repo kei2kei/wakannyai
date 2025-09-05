@@ -14,12 +14,8 @@ class CommentsController < ApplicationController
       redirect_to post_path(@comment.post), alert: "ベストアンサーに選ばれたコメントは削除できません。"
       return
     end
-    if current_user == @comment.user
-      @comment.destroy
-      redirect_to post_path(@comment.post), notice: "コメントを削除しました。"
-    else
-      redirect_to post_path(@comment.post), alert: "権限がありません。"
-    end
+    @comment.destroy
+    redirect_to post_path(@comment.post), notice: "コメントを削除しました。"
   end
 
   def new_reply
