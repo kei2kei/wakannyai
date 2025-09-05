@@ -87,3 +87,84 @@
   font-weight: bold;
 }
 
+
+
+:root {
+  --cat-min: 96px;
+  --cat-max: 256px;
+  --cat-vw: 20vw;
+  --cat-speed: .28s;
+  --cat-bob: .28s;
+}
+
+/* 🔥 ベースクラス: 全てのスプライトに共通のスタイル */
+.cat-sprite-base {
+  /* clamp()で画面幅に応じてサイズを自動調整 */
+  width: clamp(128px, 20vw, calc(var(--frame) * 1px));
+  height: clamp(128px, 20vw, calc(var(--frame) * 1px));
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  will-change: background-position, transform;
+}
+
+/* 🔥 再利用可能な共通キーフレーム */
+@keyframes sprite-steps {
+  from { background-position: 0 0; }
+  to   { background-position: calc(var(--frame) * var(--cols) * -1px) 0; }
+}
+
+@keyframes sprite-bob {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-2px); }
+}
+
+/* 🔥 個別の猫の動きとファイル名、コマ数に対応 */
+.cat-run {
+  --frame: 128; /* runのスプライトの1コマの幅 */
+  --cols: 8;   /* runのコマ数 */
+  --speed: 0.8s;
+  --bob: 0.4s;
+  background-image: url('cats/calico_run.png'); /* 例としてcalicoを使用 */
+  background-size: calc(var(--frame) * var(--cols) * 1px) 100%;
+  animation:
+    sprite-steps var(--speed) steps(var(--cols)) infinite,
+    sprite-bob var(--bob) ease-in-out infinite alternate;
+}
+
+.cat-sit {
+  --frame: 128;
+  --cols: 6;
+  --speed: 1.2s;
+  background-image: url('cats/calico_sit.png');
+  background-size: calc(var(--frame) * var(--cols) * 1px) 100%;
+  animation: sprite-steps var(--speed) steps(var(--cols)) infinite;
+}
+
+.cat-walk {
+  --frame: 128;
+  --cols: 4;
+  --speed: 1.0s;
+  --bob: 0.4s;
+  background-image: url('cats/calico_walk.png');
+  background-size: calc(var(--frame) * var(--cols) * 1px) 100%;
+  animation:
+    sprite-steps var(--speed) steps(var(--cols)) infinite,
+    sprite-bob var(--bob) ease-in-out infinite alternate;
+}
+
+.cat-laying-down {
+  --frame: 128;
+  --cols: 4;
+  --speed: 2.0s;
+  background-image: url('cats/calico_laying_down.png');
+  background-size: calc(var(--frame) * var(--cols) * 1px) 100%;
+  animation: sprite-steps var(--speed) steps(var(--cols)) infinite;
+}
+
+/* 🔥 モーション削減設定への配慮 */
+@media (prefers-reduced-motion: reduce) {
+  .cat-sprite-base {
+    animation: none !important;
+  }
+}
