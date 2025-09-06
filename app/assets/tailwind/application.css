@@ -2,8 +2,16 @@
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/forms";
 
-body {
-  color: #333333;
-  background-color: rgb(229, 227, 232);
+@theme {
+  --color-terminal-bg: #0d1117;
+  --color-terminal-text: #e6edb3;
+  --color-terminal-accent: #00ff00;
+  --color-terminal-border: #30363d;
+  --color-terminal-input: #161b22;
 }
 
+@layer base {
+  body {
+    @apply bg-terminal-bg text-terminal-text;
+  }
+}
