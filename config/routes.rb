@@ -4,6 +4,9 @@ Rails.application.routes.draw do
     get 'sign_in', to: 'devise/sessions#new', as: :new_user_session
     delete 'sign_out', to: 'devise/sessions#destroy', as: :destroy_user_session
   end
+
+  root 'posts#index'
+  get 'posts/my_posts', to: 'posts#my_posts'
   resources :posts, only: %i[new create edit update show destroy] do
     member do
       patch :solve
@@ -21,7 +24,6 @@ Rails.application.routes.draw do
     end
   end
 
-  root 'posts#index'
   get 'tags/search', to: 'tags#search'
 
   # API関連

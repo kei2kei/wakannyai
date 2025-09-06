@@ -1,9 +1,14 @@
 class PostsController < ApplicationController
+  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy, :my_posts, :solve, :sync_to_github]
   before_action :set_post, only: [:show, :edit, :update, :destroy, :solve, :sync_to_github]
 
   def index
     @q = Post.ransack(params[:q])
     @posts = @q.result(distinct: true).includes(:post_tags, :tags).order(created_at: :desc).page params[:page]
+  end
+
+  def my_posts
+    @posts = current_user.posts.order(created_at: :desc)
   end
 
   def show
@@ -78,7 +83,7 @@ class PostsController < ApplicationController
   private
 
   def set_post
-    @post = current_user.posts.find(params[:id])
+    @post = Post.find(params[:id])
   end
 
   def post_params

@@ -1,0 +1,15 @@
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-3xl font-bold text-terminal-accent">マイポスト</h1>
+    <%= link_to "新規投稿", new_post_path,
+                class: "btn-terminal" %>
+  </div>
+
+  <% if @posts.any? %>
+    <% @posts.each do |post| %>
+      <%= render post %>
+    <% end %>
+  <% else %>
+    <p class="text-terminal-text text-center mt-10">まだ投稿がありません。</p>
+  <% end %>
+</div>
