@@ -39,26 +39,7 @@
 
     <div class="flex flex-col space-y-4 w-full">
       <% @posts.each do |post| %>
-        <div class="w-full">
-          <div class="group relative p-4 border-2 border-terminal-border bg-terminal-input hover:bg-terminal-border transition-colors duration-200">
-            <div class="flex items-center justify-between">
-              <h1 class="text-terminal-accent text-lg font-medium"><%= link_to post.title, post_path(post), class: "group-hover:text-white transition-colors" %></h1>
-              <% if post.status == 'solved' %>
-                <span class="text-terminal-text bg-green-500/20 px-2 py-1 rounded text-xs font-semibold">解決済み</span>
-              <% else %>
-                <span class="text-terminal-text bg-red-500/20 px-2 py-1 rounded text-xs font-semibold">未解決</span>
-              <% end %>
-            </div>
-            <div class="flex justify-between items-center mt-2 text-sm text-terminal-text">
-              <p><%= post.content[0,50] %>...</p>
-              <div class="text-xs text-gray-400">
-                <span>By <%= post.user.name %></span>
-                <span>・</span>
-                <span><%= post.tags.map(&:name).join(',') %></span>
-              </div>
-            </div>
-          </div>
-        </div>
+        <%= render post %>
       <% end %>
     </div>
 

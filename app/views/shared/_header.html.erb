@@ -10,14 +10,8 @@
     </button>
 
     <nav class="hidden w-full space-x-5 md:flex md:w-auto md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-terminal-border flex-wrap items-center text-base justify-center">
-      <% if current_user %>
-        <%= link_to "新規作成", new_post_path, class:"hover:text-terminal-accent transition-all duration-300" %>
-      <% else %>
-        <%= link_to "ユーザー登録", user_github_omniauth_authorize_path, class:"hover:text-terminal-accent block py-2" %>
-      <% end %>
-      <a class="hover:text-terminal-accent transition-all duration-300">Second Link</a>
-      <a class="hover:text-terminal-accent transition-all duration-300">Third Link</a>
-      <a class="hover:text-terminal-accent transition-all duration-300">Fourth Link</a>
+      <%= link_to "新規作成", new_post_path, class:"hover:text-terminal-accent transition-all duration-300" %>
+      <%= link_to "マイポスト", posts_my_posts_path, class:"hover:text-terminal-accent transition-all duration-300" %>
     </nav>
 
     <%= button_to(current_user ? destroy_user_session_path : new_user_session_path,
