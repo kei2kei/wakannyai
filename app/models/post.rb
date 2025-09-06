@@ -5,7 +5,7 @@ class Post < ApplicationRecord
 
   attr_accessor :tag_names
   before_save :save_tags
-  paginates_per 9
+  paginates_per 10
 
   # Ransackで検索可能にするフィールド
   def self.ransackable_attributes(auth_object = nil)
