@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_09_02_111446) do
+ActiveRecord::Schema[7.1].define(version: 2025_09_06_084602) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -58,6 +58,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_02_111446) do
     t.bigint "parent_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_best_answer", default: false, null: false
     t.index ["parent_id"], name: "index_comments_on_parent_id"
     t.index ["post_id"], name: "index_comments_on_post_id"
     t.index ["user_id"], name: "index_comments_on_user_id"
@@ -78,13 +79,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_02_111446) do
     t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "best_comment_id"
     t.integer "status", default: 0, null: false
     t.string "github_url"
     t.string "github_sha"
     t.datetime "github_synced_at"
     t.boolean "auto_sync_github"
-    t.index ["best_comment_id"], name: "index_posts_on_best_comment_id"
     t.index ["status"], name: "index_posts_on_status"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
@@ -116,6 +115,5 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_02_111446) do
   add_foreign_key "comments", "users"
   add_foreign_key "post_tags", "posts"
   add_foreign_key "post_tags", "tags"
-  add_foreign_key "posts", "comments", column: "best_comment_id"
   add_foreign_key "posts", "users"
 end
