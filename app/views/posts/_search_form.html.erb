@@ -1,7 +1,9 @@
 <%= search_form_for @q, class: "flex w-full justify-center items-end", url: root_path do |f| %>
   <div class="relative mr-4 lg:w-full xl:w-1/2 w-2/4 md:w-full text-left">
-    <%= f.label :title_or_content_or_tags_name_cont, "タイトルやタグ、本文であなたの学習記録を検索できます。", class: "leading-7 text-sm text-gray-600" %>
-    <%= f.search_field :title_or_content_or_tags_name_cont, class: "w-full bg-gray-100 bg-opacity-50 rounded focus:ring-2 focus:ring-green-200 focus:bg-transparent border border-gray-300 focus:border-green-500 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" %>
+    <%= f.label :title_or_content_or_tags_name_cont, "タイトルやタグ、本文からみんなの学習記録を検索できます。",
+                class: "leading-7 text-sm text-terminal-text" %>
+    <%= f.search_field :title_or_content_or_tags_name_cont, 
+                       class: "w-full bg-terminal-input bg-opacity-50 rounded focus:ring-2 focus:ring-terminal-accent/50 focus:bg-transparent border border-terminal-border focus:border-terminal-accent text-base outline-none text-terminal-text py-1 px-3 leading-8 transition-colors duration-200 ease-in-out" %>
   </div>
-  <%= f.submit class: "inline-flex text-base bg-gray-100 border-0 py-2 px-6 focus:outline-none cursor-pointer rounded text-lg" %>
+  <%= f.submit "検索", class: "inline-flex text-base bg-terminal-accent text-terminal-bg font-bold border-0 py-2 px-6 focus:outline-none cursor-pointer rounded text-lg" %>
 <% end %>
