@@ -1,8 +1,19 @@
-<%= form_with model: comment, id: "reply-form-#{comment.parent_id}", class: "reply-form", url: post_comments_path(post) do |f| %>
-  <%= f.label :content %>
-  <%= f.text_area :content %>
-  <% if parent_comment.present? %>
-    <%= f.hidden_field :parent_id, value: parent_comment.id %>
+<div class="mt-4 p-6 border-2 border-terminal-border bg-terminal-input rounded-lg shadow-sm">
+  <%= form_with model: comment, id: "reply-form-#{comment.parent_id}", class: "reply-form", url: post_comments_path(post) do |f| %>
+    <div class="mb-4">
+      <%= f.label :content, value: "コメントを書く", class: "block text-sm font-medium text-terminal-text" %>
+      <%= f.text_area :content,
+          class: "w-full mt-1 px-3 py-2 border border-terminal-border rounded-lg bg-terminal-input text-terminal-text shadow-sm focus:outline-none focus:ring-2 focus:ring-terminal-accent/50 focus:border-terminal-accent",
+          rows: 4 %>
+    </div>
+
+    <% if parent_comment.present? %>
+      <%= f.hidden_field :parent_id, value: parent_comment.id %>
+    <% end %>
+
+    <div class="flex justify-end">
+      <%= f.submit "投稿する",
+          class: "inline-flex px-6 py-2 bg-terminal-accent text-terminal-bg font-bold border-0 cursor-pointer rounded-lg hover:bg-terminal-accent/80 transition-colors duration-200" %>
+    </div>
   <% end %>
-  <%= f.submit '投稿する'%>
-<% end %>
+</div>

@@ -1,3 +1,5 @@
-<h1>新規作成</h1>
-<%= render 'form', post: @post %>
-<%= link_to "戻る", root_path %>
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+  <h1 class="text-3xl font-bold mb-8 text-terminal-accent">新規作成</h1>
+  <%= render 'shared/form', post: @post %>
+  <%= link_to "戻る", root_path, class: "inline-flex px-6 py-2 bg-terminal-accent text-terminal-bg font-medium rounded-lg hover:bg-terminal-accent/80 transition-colors duration-200" %>
+</div>
