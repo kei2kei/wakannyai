@@ -22,7 +22,6 @@ class Post < ApplicationRecord
   has_many :tags, through: :post_tags
   has_many :comments, dependent: :destroy
   has_many_attached :images, dependent: :purge_later
-  belongs_to :best_comment, class_name: "Comment", optional: true
 
   private
 
@@ -35,6 +34,10 @@ class Post < ApplicationRecord
         self.tags << tag
       end
     end
+  end
+
+  def has_best_comment?
+    return self.comments.exists?(is_best_answer: true)
   end
 end
 

@@ -9,8 +9,7 @@ class CommentsController < ApplicationController
   end
 
   def destroy
-    @comment = current_user.comments.find(params[:id])
-    if @comment.post.best_comment_id == @comment.id
+    if @comment.is_best_answer
       redirect_to post_path(@comment.post), alert: "ベストアンサーに選ばれたコメントは削除できません。"
       return
     end
@@ -29,28 +28,26 @@ class CommentsController < ApplicationController
 
   def set_best_comment
     @comment = Comment.find(params[:id])
-    comment_author = @comment.user
-    unless can_set_best_comment?
-      redirect_to post_path(@comment.post), alert: '権限がありません。'
+    if @comment.post.has_best_comment?
+      redirect_to @comment.post, notice: '既にベストアンサーは選ばれています。'
+      return
     end
 
-    @comment.post.update(best_comment: @comment)
-    comment_author.increment!(:points, 5)
-    comment_author.cat.update_level
-    redirect_to post_path(@comment.post), notice: 'ベストアンサーを選びました。'
+    is_post_owner = (current_user == @comment.post.user)
+    is_not_comment_author = (current_user != @comment.user)
+
+    if is_post_owner && is_not_comment_author
+      @comment.update(is_best_answer: true)
+      @comment.user.increment!(:points, 5)
+      @comment.user.cat.update_level
+      redirect_to @comment.post, notice: 'ベストアンサーを選びました。'
+    else
+      redirect_to @comment.post, alert: 'ベストアンサーを選べるのは投稿者本人のみで、自身のコメントは選べません。'
+    end
   end
 
   private
   def comment_params
     params.require(:comment).permit(:content, :parent_id).merge(post_id: params[:post_id])
-  end
-
-  def can_set_best_comment?(comment_author)
-    # 投稿の投稿者が選んでいるか
-    # まだベストアンサーが選ばれていないか
-    # 自分自身のコメントを選んでいないか
-    current_user == @comment.post.user &&
-      @comment.post.best_comment.blank? &&
-      current_user != comment_author
   end
 end
