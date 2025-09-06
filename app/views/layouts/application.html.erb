@@ -13,7 +13,7 @@
     <%= javascript_importmap_tags %>
   </head>
   <body>
-    <%= render 'layouts/header' %>
+    <%= render 'shared/header' %>
     <main>
       <% flash.each do |message_type, message| %>
         <div class="alert alert-<%= message_type %>">
