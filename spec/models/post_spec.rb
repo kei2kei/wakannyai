@@ -50,19 +50,12 @@ RSpec.describe Post, type: :model do
       let(:user) { create(:user) }
       let(:post) { create(:post, user: user) }
       let(:other_user) { create(:user) }
-      let!(:best_comment) { create(:comment, post: post, user: other_user) }
-      before do
-        # 投稿にベストアンサーを設定する
-        post.update(best_comment: best_comment)
+      let!(:best_comment) { create(:comment, post: post, user: other_user, is_best_answer: true) }
+      it "ベストアンサー設定時も削除可能" do
+        expect { post.destroy }.to change(Post, :count).by(-1)
       end
-
-        # 💡 ベストアンサーが設定された投稿は削除できない
-      it "cannot be deleted" do
-        expect { post.destroy }.to change(Post, :count).by(0)
-      end
-      it "leaves the post intact and returns an error" do
-        expect(post.destroy).to be_falsey
-        expect(post.reload).to be_present
+      it "コメントとのアソシエーションにより関連コメントの削除も確認" do
+        expect { post.destroy }.to change(Comment, :count).by(-1)
       end
     end
   end
