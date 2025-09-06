@@ -48,8 +48,12 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    @post.destroy
-    redirect_to root_path
+    if @post.best_comment_id.present?
+      redirect_to @post, alert: "ベストアンサーが設定された投稿は削除できません。"
+    else
+      @post.destroy
+      redirect_to root_path, notice: "投稿を削除しました。"
+    end
   end
 
   def solve
