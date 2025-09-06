@@ -3,6 +3,12 @@ class Post < ApplicationRecord
   validates :content, presence: true, length: { maximum: 65_535 }
   enum status: { unsolved: 0, solved: 1 }
 
+  belongs_to :user
+  has_many :post_tags, dependent: :destroy
+  has_many :tags, through: :post_tags
+  has_many :comments, dependent: :destroy
+  has_many_attached :images, dependent: :purge_later
+
   attr_accessor :tag_names
   before_save :save_tags
   paginates_per 10
@@ -17,11 +23,9 @@ class Post < ApplicationRecord
     ["user", "tags"]
   end
 
-  belongs_to :user
-  has_many :post_tags, dependent: :destroy
-  has_many :tags, through: :post_tags
-  has_many :comments, dependent: :destroy
-  has_many_attached :images, dependent: :purge_later
+  def has_best_comment?
+    comments.exists?(is_best_answer: true)
+  end
 
   private
 
@@ -34,10 +38,6 @@ class Post < ApplicationRecord
         self.tags << tag
       end
     end
-  end
-
-  def has_best_comment?
-    return self.comments.exists?(is_best_answer: true)
   end
 end
 
