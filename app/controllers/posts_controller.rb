@@ -1,5 +1,5 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, only: [:new, :create, :edit, :update, :destroy, :my_posts, :solve, :sync_to_github]
+  skip_before_action :authenticate_user!, only: [:index]
   before_action :set_post, only: [:show, :edit, :update, :destroy, :solve, :sync_to_github]
 
   def index
