@@ -13,7 +13,7 @@ RSpec.describe PostsController, type: :controller do
       it '投稿が成功すると、ポイントが加算されてルートパスにリダイレクトされる' do
         expect { post :create, params: { post: post_params } }.to change(Post, :count).by(1)
         expect(user.reload.points).to eq(1) # 1ポイント加算を確認
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(post_path(Post.last))
       end
     end
 

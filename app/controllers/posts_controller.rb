@@ -30,7 +30,7 @@ class PostsController < ApplicationController
       purge_images if params[:post][:purged_image_ids]
       current_user.increment!(:points, 1)
       current_user.cat.update_level
-      redirect_to root_path
+      redirect_to post_path(@post)
     else
       @unattached_blobs = find_unattached_blobs
       render :new, status: :unprocessable_entity
@@ -41,7 +41,7 @@ class PostsController < ApplicationController
     if @post.update(post_params)
       # formのパージ用隠しフィールドに入ってるものは削除
       purge_images if params[:post][:purged_image_ids]
-      redirect_to post_path(@post.id)
+      redirect_to post_path(@post)
     else
       @unattached_blobs = find_unattached_blobs
       render :edit, status: :unprocessable_entity
