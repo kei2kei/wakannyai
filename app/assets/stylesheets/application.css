@@ -12,6 +12,7 @@
  *
  *= require_tree .
  *= require_self
+ *= require vendor/tagify
  */
 @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
 body {
