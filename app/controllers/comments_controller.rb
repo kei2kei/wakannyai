@@ -9,6 +9,7 @@ class CommentsController < ApplicationController
   end
 
   def destroy
+    @comment = current_user.comments.find(params[:id])
     if @comment.is_best_answer
       redirect_to post_path(@comment.post), alert: "ベストアンサーに選ばれたコメントは削除できません。"
       return
