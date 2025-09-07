@@ -5,7 +5,7 @@ ARG RUBY_VERSION=3.3.0
 FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim as base
 
 # Rails app lives here
-WORKDIR /my_blog_app
+WORKDIR /wakannyai
 
 # Set production environment
 ENV RAILS_ENV="development" \
@@ -69,15 +69,15 @@ RUN set -eux; \
 
 # Copy built artifacts: gems, application
 COPY --from=build /usr/local/bundle /usr/local/bundle
-COPY --from=build /my_blog_app /my_blog_app
+COPY --from=build /wakannyai /wakannyai
 
 # Run and own only the runtime files as a non-root user for security
 RUN useradd -m -s /bin/bash rails && \
-  chown -R rails:rails /my_blog_app
+  chown -R rails:rails /wakannyai
 USER rails
 
 # Entrypoint prepares the database.
-ENTRYPOINT ["/my_blog_app/bin/docker-entrypoint"]
+ENTRYPOINT ["/wakannyai/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000
