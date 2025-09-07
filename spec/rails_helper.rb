@@ -72,4 +72,8 @@ RSpec.configure do |config|
     ActiveJob::Base.queue_adapter = :test
   end
   config.include Devise::Test::ControllerHelpers, type: :controller
+  config.include Warden::Test::Helpers, type: :system
+  config.before(:suite) { Warden.test_mode! }
+  config.after(:each)   { Warden.test_reset! }
+  Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }
 end
