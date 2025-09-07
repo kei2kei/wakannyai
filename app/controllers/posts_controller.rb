@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index]
-  before_action :set_post, only: [:show, :edit, :update, :destroy, :solve, :sync_to_github]
+  before_action :set_post, only: [:edit, :update, :destroy, :solve, :sync_to_github]
 
   def index
     @q = Post.ransack(params[:q])
@@ -12,6 +12,7 @@ class PostsController < ApplicationController
   end
 
   def show
+    @post = Post.find(params[:id])
     @comment = @post.comments.new
     @comments = @post.comments.where(parent_id: nil).includes(:replies)
   end
@@ -48,9 +49,11 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    @post.destroy
-    redirect_to root_path, notice: "投稿を削除しました。"
-    
+    if @post.destroy
+      redirect_to root_path, notice: "投稿を削除しました。"
+    else
+      redirect_to @post, alert: "投稿を削除できませんでした。"
+    end
   end
 
   def solve
@@ -84,7 +87,7 @@ class PostsController < ApplicationController
   private
 
   def set_post
-    @post = Post.find(params[:id])
+    @post = current_user.posts.find(params[:id])
   end
 
   def post_params

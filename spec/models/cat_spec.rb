@@ -1,4 +1,3 @@
-# spec/models/cat_spec.rb
 
 require 'rails_helper'
 
