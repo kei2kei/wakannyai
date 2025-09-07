@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index]
-  before_action :set_post, only: [:show, :edit, :update, :destroy, :solve, :sync_to_github]
+  before_action :set_post, only: [:edit, :update, :destroy, :solve, :sync_to_github]
 
   def index
     @q = Post.ransack(params[:q])
@@ -12,6 +12,7 @@ class PostsController < ApplicationController
   end
 
   def show
+    @post = Post.find(params[:id])
     @comment = @post.comments.new
     @comments = @post.comments.where(parent_id: nil).includes(:replies)
   end
@@ -29,7 +30,7 @@ class PostsController < ApplicationController
       purge_images if params[:post][:purged_image_ids]
       current_user.increment!(:points, 1)
       current_user.cat.update_level
-      redirect_to root_path
+      redirect_to post_path(@post)
     else
       @unattached_blobs = find_unattached_blobs
       render :new, status: :unprocessable_entity
@@ -40,7 +41,7 @@ class PostsController < ApplicationController
     if @post.update(post_params)
       # formのパージ用隠しフィールドに入ってるものは削除
       purge_images if params[:post][:purged_image_ids]
-      redirect_to post_path(@post.id)
+      redirect_to post_path(@post)
     else
       @unattached_blobs = find_unattached_blobs
       render :edit, status: :unprocessable_entity
@@ -48,8 +49,11 @@ class PostsController < ApplicationController
   end
 
   def destroy
-    @post.destroy
-    redirect_to root_path
+    if @post.destroy
+      redirect_to root_path, notice: "投稿を削除しました。"
+    else
+      redirect_to @post, alert: "投稿を削除できませんでした。"
+    end
   end
 
   def solve
@@ -83,7 +87,7 @@ class PostsController < ApplicationController
   private
 
   def set_post
-    @post = Post.find(params[:id])
+    @post = current_user.posts.find(params[:id])
   end
 
   def post_params

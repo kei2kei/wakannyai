@@ -1,7 +1,7 @@
 <div class="mt-4 p-6 border-2 border-terminal-border bg-terminal-input rounded-lg shadow-sm">
   <%= form_with model: comment, id: "reply-form-#{comment.parent_id}", class: "reply-form", url: post_comments_path(post) do |f| %>
     <div class="mb-4">
-      <%= f.label :content, value: "コメントを書く", class: "block text-sm font-medium text-terminal-text" %>
+      <%= f.label :content, "コメントを書く", class: "block text-sm font-medium text-terminal-text" %>
       <%= f.text_area :content,
           class: "w-full mt-1 px-3 py-2 border border-terminal-border rounded-lg bg-terminal-input text-terminal-text shadow-sm focus:outline-none focus:ring-2 focus:ring-terminal-accent/50 focus:border-terminal-accent",
           rows: 4 %>

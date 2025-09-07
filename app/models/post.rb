@@ -3,8 +3,14 @@ class Post < ApplicationRecord
   validates :content, presence: true, length: { maximum: 65_535 }
   enum status: { unsolved: 0, solved: 1 }
 
+  belongs_to :user
+  has_many :post_tags, dependent: :destroy
+  has_many :tags, through: :post_tags
+  has_many :comments, dependent: :destroy
+  has_many_attached :images, dependent: :purge_later
+
   attr_accessor :tag_names
-  before_save :save_tags
+  after_save :apply_tag_names
   paginates_per 10
 
   # Ransackで検索可能にするフィールド
@@ -17,24 +23,27 @@ class Post < ApplicationRecord
     ["user", "tags"]
   end
 
-  belongs_to :user
-  has_many :post_tags, dependent: :destroy
-  has_many :tags, through: :post_tags
-  has_many :comments, dependent: :destroy
-  has_many_attached :images, dependent: :purge_later
-  belongs_to :best_comment, class_name: "Comment", optional: true
+  def has_best_comment?
+    comments.exists?(is_best_answer: true)
+  end
+
+  def tag_names
+    @tag_names.presence || tags.pluck(:name).join(', ')
+  end
 
   private
 
-  def save_tags
-    self.tags.clear
-    if tag_names.present?
-      tag_names.split(',').map(&:strip).uniq.reject(&:empty?).each do |tag_name|
-        # 既存のタグを利用or新しいタグを作成する
-        tag = Tag.find_or_create_by(name: tag_name)
-        self.tags << tag
-      end
-    end
+  def apply_tag_names
+    return if tag_names.nil?
+
+    names =
+      tag_names.to_s.tr('、', ',')
+                .split(',')
+                .map { _1.strip }
+                .reject(&:blank?)
+                .uniq
+
+    self.tags = names.map { |n| Tag.find_or_create_by!(name: n) }
   end
 end
 

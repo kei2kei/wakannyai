@@ -9,7 +9,6 @@ WORKDIR /my_blog_app
 
 # Set production environment
 ENV RAILS_ENV="development" \
-  BUNDLE_DEPLOYMENT="1" \
   BUNDLE_PATH="/usr/local/bundle" \
   BUNDLE_WITHOUT="development"
 
@@ -60,6 +59,13 @@ RUN apt-get update -qq && \
     apt-get install -y nodejs && \
     npm install -g yarn && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+RUN set -eux; \
+  apt-get update -qq; \
+  apt-get install --no-install-recommends -y \
+    chromium chromium-driver \
+    fonts-liberation fonts-noto-cjk; \
+  rm -rf /var/lib/apt/lists/*
 
 # Copy built artifacts: gems, application
 COPY --from=build /usr/local/bundle /usr/local/bundle

@@ -1,10 +1,10 @@
-#!/bin/bash -e
+#!/usr/bin/env bash
+set -e
 
-# If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
-  ./bin/rails db:prepare
+# test環境 & 追加のコマンドが渡されたら、dev用プロセス群を起動せずにそのまま実行
+if [ "${RAILS_ENV}" = "test" ] && [ $# -gt 0 ]; then
+  exec "$@"
 fi
 
-rm -f /test_app/tmp/pids/server.pid
-
-exec "${@}"
+# それ以外は従来どおり（bin/dev 等）
+exec bin/dev

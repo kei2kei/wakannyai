@@ -1,95 +1,46 @@
 import { Controller } from "@hotwired/stimulus"
+import Tagify from "@yaireo/tagify/dist/tagify.esm.js"
 
-// Connects to data-controller="tag-manager"
 export default class extends Controller {
-  static targets = ["input", "searchResult", "tagListContainer", "hiddenInput"];
   connect() {
-    console.log("TagManagerControllerに接続!");
-    this.selectedTags = (this.hiddenInputTarget.value?.trim() || '').split(',').map(str => str.trim()).filter(tag => tag.length > 0);
-    this._renderTags();
+    const input = this.element.querySelector('input[name="post[tag_names]"]')
+    if (!input) return
+
+    this.tagify = new Tagify(input, {
+      enforceWhitelist: false,
+      dropdown: { enabled: 1, maxItems: 5, closeOnSelect: true, highlightFirst: true, fuzzySearch: false },
+      originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
+    })
+
+    this.onInput = this.onInput?.bind(this)
+    this.tagify.on("input", this.onInput)
   }
 
-  _renderTags() {
-    // リストのリセット
-    this.tagListContainerTarget.innerHTML = '';
-    for(let tag of this.selectedTags){
-      const newTagContent = document.createElement("span");
-      newTagContent.textContent = tag;
-      const deleteButton = document.createElement("button");
-      deleteButton.textContent = 'x';
-      deleteButton.dataset.action = "click->tag-manager#removeTag";
-      deleteButton.dataset.tagName = tag;
-      newTagContent.appendChild(deleteButton);
-      this.tagListContainerTarget.appendChild(newTagContent);
-    }
-    this._updateHiddenTags();
-  }
-
-  _updateHiddenTags() {
-    this.hiddenInputTarget.value = this.selectedTags.join(',');
-  }
-
-  _addTagAndCleanUp(tagName) {
-    this.selectedTags.includes(tagName) || this.selectedTags.push(tagName)
-    this.inputTarget.value = '';
-    this.searchResultTarget.innerHTML = '';
-    this.searchResultTarget.style.display = 'none';
-    this._renderTags();
-  }
-
-  removeTag(event) {
-    const tagNameToRemove = event.target.dataset.tagName;
-    this.selectedTags = this.selectedTags.filter(tag => tag !== tagNameToRemove);
-    this._renderTags();
-  }
-
-  async searchTags() {
-    console.log("検索開始!");
-    // view側で指定したリクエスト先のURL
-    const requestURL = this.data.get("searchUrl");
-    // selectエレメント
-    const tagElement = this.searchResultTarget;
-    // イベント発火時に前のイベント時に保有していたリストを削除
-    tagElement.innerHTML = '';
-
-    // changeイベントを確実に発火するために最初にダミーの候補を入れる
-    const defaultOption = document.createElement("option");
-    defaultOption.value = ""; // 値は空にする
-    defaultOption.textContent = "タグ候補"
-    defaultOption.disabled = true; // 選択不可にする
-    defaultOption.selected = true; // 最初から選択状態にする
-    tagElement.appendChild(defaultOption);
-
-    // ユーザーの入力値を元にSQLの後方一致を検索しにいくためのクエリ
-    const queryParams = {
-      query: this.inputTarget.value,
-    };
-
-    const requestParams = new URLSearchParams(queryParams);
-    const response = await fetch(`${requestURL}?${requestParams}`);
-    const data = await response.json();
-    for (let tag of data) {
-      const newTag = document.createElement("option");
-      newTag.value = tag.id;
-      newTag.textContent = tag.name;
-      tagElement.appendChild(newTag);
-    }
-    if (data.length > 0) {
-      this.searchResultTarget.style.display = 'inline-block';
-    } else {
-      this.searchResultTarget.style.display = 'none';
+  disconnect() {
+    if (this.tagify) {
+      this.tagify.off("input", this.onInput)
+      this.tagify.destroy()
     }
   }
 
-  selectTag(event) {
-    const selectedContent = event.target.options[event.target.selectedIndex].textContent;
-    this._addTagAndCleanUp(selectedContent);
-  }
+  async onInput(e) {
+    const q = (e.detail?.value || "").trim()
+    if (!q) { this.tagify.settings.whitelist = []; this.tagify.dropdown.hide(); return }
 
-  // ユーザーが候補選択しなかった場合の処理
-  addTagFromInput() {
-    if(this.inputTarget.value){
-      this._addTagAndCleanUp(this.inputTarget.value);
+    try {
+      const res = await fetch(`/tags/search?q=${encodeURIComponent(q)}`, { headers: { "Accept": "application/json" } })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const data = await res.json()
+
+      // サーバが {value, id} を返す前提。もし {id, name} なら map で value に変換してOK
+      const items = data.map(x => (x.value ? x : { value: x.name, id: x.id }))
+
+      this.tagify.settings.whitelist = items
+      this.tagify.dropdown.show(q)
+    } catch (err) {
+      console.error("Tagify fetch error:", err)
+      this.tagify.settings.whitelist = []
+      this.tagify.dropdown.hide()
     }
   }
 }

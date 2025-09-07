@@ -1,7 +1,7 @@
 <% indentation = comment.parent_id.present? ? 'ml-8' : '' %>
 
 <div class="relative p-4 mb-4 border-2 border-terminal-border bg-terminal-input rounded-lg shadow-sm <%= indentation %>" data-controller="comment">
-  <% if post.best_comment_id == comment.id %>
+  <% if comment.is_best_answer %>
     <i class="text-terminal-accent text-sm font-semibold">✨ ベストアンサー ✨</i>
   <% end %>
 
@@ -15,7 +15,7 @@
   </div>
 
   <div class="mt-4 flex gap-2 justify-end items-center">
-    <% if current_user == post.user && post.best_comment_id.nil? && comment.user != post.user %>
+    <% if current_user == post.user && !post.has_best_comment? && comment.user != post.user %>
       <%= button_to "ベストアンサーに選ぶ", set_best_comment_comment_path(comment), method: :patch, class: "btn-terminal-accent" %>
     <% end %>
 

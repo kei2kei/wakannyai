@@ -12,5 +12,16 @@ services:
       - .:/my_blog_app
     ports:
       - "3000:3000"
+    shm_size: "2gb"
     depends_on:
       - db
+  test:
+    build: .
+    depends_on: [db]
+    volumes:
+      - .:/my_blog_app
+    environment:
+      RAILS_ENV: test
+    entrypoint: ""                    # ← ENTRYPOINTを無効化
+    command: bash -lc "bundle exec rails db:test:prepare && bundle exec rspec"
+    shm_size: "2gb"
