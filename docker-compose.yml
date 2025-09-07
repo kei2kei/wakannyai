@@ -9,7 +9,7 @@ services:
     build: .
     command: bin/dev
     volumes:
-      - .:/my_blog_app
+      - .:/wakannyai
     ports:
       - "3000:3000"
     shm_size: "2gb"
@@ -19,7 +19,7 @@ services:
     build: .
     depends_on: [db]
     volumes:
-      - .:/my_blog_app
+      - .:/wakannyai
     environment:
       RAILS_ENV: test
     entrypoint: ""                    # ← ENTRYPOINTを無効化

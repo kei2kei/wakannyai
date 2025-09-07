@@ -6,9 +6,9 @@
     <% if current_user && current_user.cat %>
       <div class="relative w-full text-center">
         <div class="cat-sprite-base mx-auto mb-4"
-             data-controller="cat-animator"
-             data-cat-animator-level-value="<%= current_user.cat.level %>"
-             data-cat-animator-color-value="<%= current_user.cat.color %>">
+            data-controller="cat-animator"
+            data-cat-animator-level-value="<%= current_user.cat.level %>"
+            data-cat-animator-color-value="<%= current_user.cat.color %>">
         </div>
         <h2 class="text-xl md:text-2xl font-bold mt-4">
           <%= current_user.name %>さんの猫
@@ -17,6 +17,12 @@
           <p class="text-lg">レベル: <span class="font-bold text-terminal-accent"><%= current_user.cat.level %></span></p>
           <p class="text-lg">ポイント: <span class="font-bold text-terminal-accent"><%= current_user.points %></span> pts</p>
         </div>
+      </div>
+    <% else %>
+      <div class="relative w-full text-center">
+        <h2 class="text-xl md:text-2xl font-bold mt-4">
+          ログインしてください
+        </h2>
       </div>
     <% end %>
   </div>
