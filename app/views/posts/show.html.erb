@@ -25,7 +25,7 @@
           <%= link_to "編集", edit_post_path(@post), class: "btn-terminal" %>
           <%= link_to "削除", post_path(@post), data: { turbo_method: :delete, confirm: "本当に削除しますか？" }, class: "btn-terminal-danger" %>
           <% if @post.unsolved? %>
-            <%= button_to "解決した", solve_post_path(@post), method: :patch, data: { confirm: 'この問題を解決済みにしますか？' }, class: "btn-terminal-accent" %>
+            <%= button_to "解決した", solve_post_path(@post), method: :patch, data: { turbo_confirm: 'この問題を解決済みにしますか？' }, class: "btn-terminal-accent" %>
           <% end %>
         <% end%>
       </div>
