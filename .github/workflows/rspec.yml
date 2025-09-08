@@ -50,24 +50,15 @@ jobs:
       - name: DB prepare
         run: bin/rails db:prepare
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      # ★ Tailwind（tailwindcss-rails）でCSS生成
+      - name: Build Tailwind
+        run: bin/rails tailwindcss:build
 
-      - name: Install JS deps
-        run: |
-          corepack enable
-          yarn install --frozen-lockfile
-
-      # ① Tailwind 生成（package.json に build:css がある前提）
-      - name: Build CSS
-        run: yarn build:css
-
-      # ② Sprockets のマニフェスト生成（必要に応じて）
+      # （オプション）Sprocketsにマニフェストを作らせたい場合は残す
       - name: Precompile assets for test
         env:
           RAILS_ENV: test
-          SECRET_KEY_BASE_DUMMY: "1" # 念のため
+          SECRET_KEY_BASE_DUMMY: "1"
         run: bin/rails assets:precompile
 
       - name: Run RSpec
