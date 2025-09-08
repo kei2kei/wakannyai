@@ -1,0 +1,56 @@
+name: RSpec
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  rspec:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: my_blog_app_test
+        ports:
+          - "5432:5432"
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/my_blog_app_test
+      # testでcredentialsが要る場合だけ↓を有効化（GitHub Secretsに登録）
+      # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.0
+          bundler-cache: true
+
+      # Chrome（Selenium用）
+      - id: chrome
+        uses: browser-actions/setup-chrome@v1
+
+      # 必要ならネイティブ依存（例: ActiveStorageのvariantでvipsを使う等）
+      - name: Install system deps
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y libvips
+
+      - name: DB prepare
+        run: |
+          bin/rails db:prepare
+
+      - name: Run RSpec
+        run: |
+          bundle exec rspec --format documentation
