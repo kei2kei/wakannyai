@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :user do
     name { "Test User" }
-    sequence(:email) { |n| "test#{n}@example.com" }
+    sequence(:email) { |n| "test-#{n}-#{SecureRandom.hex(4)}@example.com" }
 
     trait :github_authenticated do
       github_token { "mock_github_token" }
