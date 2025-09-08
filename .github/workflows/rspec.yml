@@ -4,6 +4,10 @@ on:
   push:
   pull_request:
 
+concurrency:
+  group: rspec-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   rspec:
     runs-on: ubuntu-latest
@@ -26,8 +30,7 @@ jobs:
     env:
       RAILS_ENV: test
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/my_blog_app_test
-      # testでcredentialsが要る場合だけ↓を有効化（GitHub Secretsに登録）
-      # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+      # RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }} # 必要な場合のみ
 
     steps:
       - uses: actions/checkout@v4
@@ -37,20 +40,35 @@ jobs:
           ruby-version: 3.3.0
           bundler-cache: true
 
-      # Chrome（Selenium用）
-      - id: chrome
-        uses: browser-actions/setup-chrome@v1
+      - uses: browser-actions/setup-chrome@v1
 
-      # 必要ならネイティブ依存（例: ActiveStorageのvariantでvipsを使う等）
       - name: Install system deps
         run: |
           sudo apt-get update -y
           sudo apt-get install -y libvips
 
       - name: DB prepare
+        run: bin/rails db:prepare
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install JS deps
         run: |
-          bin/rails db:prepare
+          corepack enable
+          yarn install --frozen-lockfile
+
+      # ① Tailwind 生成（package.json に build:css がある前提）
+      - name: Build CSS
+        run: yarn build:css
+
+      # ② Sprockets のマニフェスト生成（必要に応じて）
+      - name: Precompile assets for test
+        env:
+          RAILS_ENV: test
+          SECRET_KEY_BASE_DUMMY: "1" # 念のため
+        run: bin/rails assets:precompile
 
       - name: Run RSpec
-        run: |
-          bundle exec rspec --format documentation
+        run: bundle exec rspec --format documentation
