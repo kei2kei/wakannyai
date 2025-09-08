@@ -22,6 +22,7 @@ services:
       - .:/wakannyai
     environment:
       RAILS_ENV: test
-    entrypoint: ""                    # ← ENTRYPOINTを無効化
-    command: bash -lc "bundle exec rails db:test:prepare && bundle exec rspec"
+      DATABASE_URL: postgres://postgres:postgres@db:5432/wakannyai_test
+    entrypoint: ""
+    command: bash -lc "bin/rails tailwindcss:build && bundle exec rails db:test:prepare && bundle exec rspec"
     shm_size: "2gb"
