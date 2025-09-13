@@ -12,7 +12,8 @@ class ImagesController < ApplicationController
         blob = ActiveStorage::Blob.create_and_upload!(
           io: uploaded_file.open,
           filename: uploaded_file.original_filename,
-          content_type: uploaded_file.content_type
+          content_type: uploaded_file.content_type,
+          metadata: { uploader_id: current_user.id }
         )
 
         render json: {
@@ -31,17 +32,18 @@ class ImagesController < ApplicationController
 
   def destroy
     begin
-      blob = ActiveStorage::Blob.find_by(id: params[:id])
+      blob = ActiveStorage::Blob.find_signed(params[:id])
+      return head :not_found unless blob
 
-      if blob
-        blob.purge
-        head :no_content
-      else
-        head :not_found
-      end
+      # 所有者チェック（metadata は文字列化されることが多いので to_i で吸収）
+      uploader_id = blob.metadata&.[]('uploader_id').to_i
+      return head :forbidden unless uploader_id == current_user.id
+
+      blob.purge
+      head :no_content
     rescue => e
-      Rails.logger.error "Image deletion failed: #{e.message}"
-      render json: { error: 'Image deletion failed' }, status: :internal_server_error
+      Rails.logger.error "画像の削除に失敗しました。: #{e.message}"
+      render json: { error: '画像の削除に失敗しました。' }, status: :internal_server_error
     end
   end
 end
