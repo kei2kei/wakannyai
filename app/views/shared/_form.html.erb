@@ -36,9 +36,17 @@
           プレビュー
         </label>
         <div id="preview-container"
-            class="flex-grow border border-terminal-border rounded-lg bg-terminal-input p-6 overflow-y-auto shadow-sm"
+            class="prose prose-invert max-w-none
+                  border border-terminal-border rounded-lg
+                bg-terminal-input p-6 overflow-y-auto shadow-sm
+                prose-headings:text-terminal-text
+                prose-a:text-terminal-accent
+                prose-p: text-terminal-text
+                prose-pre:bg-terminal-input
+                prose-pre:text-terminal-text
+                prose-code:text-terminal-text"
             data-markdown-editor-target="preview">
-          <p class="text-gray-400 italic">ここに内容のプレビューが表示されます</p>
+          <p class="text-gray-400 italic not-prose">ここに内容のプレビューが表示されます</p>
         </div>
       </div>
     </div>
