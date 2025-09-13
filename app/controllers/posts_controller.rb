@@ -90,8 +90,17 @@ class PostsController < ApplicationController
     @post = current_user.posts.find(params[:id])
   end
 
+  def filter_own_images!(signed_ids)
+    Array(signed_ids).filter_map do |sid|
+      blob = ActiveStorage::Blob.find_signed(sid) rescue nil
+      blob if blob&.metadata&.[]('uploader_id') == current_user.id
+    end.map(&:signed_id)
+  end
+
   def post_params
-    params.require(:post).permit(:title, :content, :tag_names, images: [])
+    permitted = params.require(:post).permit(:title, :content, :tag_names, images: [])
+    permitted[:images] = filter_own_images!(permitted[:images]) if permitted[:images]
+    permitted
   end
 
   def purge_images
