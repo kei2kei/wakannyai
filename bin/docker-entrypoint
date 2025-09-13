@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+if [ -n "$ACTIVE_STORAGE_DISK_ROOT" ]; then
+  mkdir -p "$ACTIVE_STORAGE_DISK_ROOT"
+  chown -R rails:rails "$ACTIVE_STORAGE_DISK_ROOT" || true
+fi
+
 # test環境 & 追加のコマンドが渡されたら、dev用プロセス群を起動せずにそのまま実行
 if [ "${RAILS_ENV}" = "test" ] && [ $# -gt 0 ]; then
   exec "$@"
