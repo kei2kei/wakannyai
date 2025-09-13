@@ -11,7 +11,7 @@ class ImagesController < ApplicationController
         )
 
         render json: {
-          url: url_for(blob),
+          url: rails_blob_path(blob, only_path: true),
           blob_id: blob.id,
           signed_id: blob.signed_id
         }, status: :created
