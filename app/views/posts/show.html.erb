@@ -9,7 +9,18 @@
     </div>
 
     <div>
-      <p class="mt-4 text-terminal-text">内容：<%= rendered_content_html(@post.content) %></p>
+      <div class="mt-4 text-terminal-text mb-2">内容：</div>
+      <article
+        class="prose prose-invert max-w-none
+              prose-headings:text-terminal-accent
+              prose-a:text-terminal-accent
+              prose-strong:text-terminal-text
+              prose-p:text-terminal-text
+              prose-hr:border-terminal-border
+              prose-pre:bg-terminal-input prose-pre:text-terminal-text
+              prose-code:text-terminal-text">
+        <%= rendered_content_html(@post.content) %>
+      </article>
     </div>
 
     <div class="mt-6 border-t border-terminal-border pt-4 text-sm text-gray-400">
