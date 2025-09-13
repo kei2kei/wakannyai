@@ -1,6 +1,11 @@
 class ImagesController < ApplicationController
+  MAX_SIZE = 10.megabytes
+  ALLOWED = %w[image/png image/jpeg image/gif image/webp]
   def upload
     uploaded_file = params[:image]
+    return render json: { error: 'ファイルが添付されませんでした。' }, status: :unprocessable_entity unless uploaded_file
+    return render json: { error: 'ファイルサイズが大きすぎます。' }, status: :payload_too_large if uploaded_file.size.to_i > MAX_SIZE
+    return render json: { error: 'ファイルタイプが無効です。' }, status: :unsupported_media_type unless ALLOWED.include?(uploaded_file.content_type)
 
     if uploaded_file.present?
       begin
