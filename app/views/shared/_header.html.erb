@@ -15,7 +15,7 @@
     </nav>
 
     <%= button_to(current_user ? destroy_user_session_path : new_user_session_path,
-            class: "inline-flex items-center bg-terminal-accent text-terminal-bg border-0 py-1 px-3 focus:outline-none cursor-pointer rounded-lg text-base mt-4 md:mt-0 hover:bg-terminal-text", 
+            class: "inline-flex items-center bg-terminal-accent text-terminal-bg border-0 py-1 px-3 focus:outline-none cursor-pointer rounded-lg text-base mt-4 md:mt-0 hover:bg-terminal-text",
             form: { class: "hidden md:flex" },
             method: current_user ? :delete : :get) do %>
       <%= current_user ? 'ログアウト' : 'ログイン' %>
@@ -37,8 +37,7 @@
             <%= link_to "新規作成", new_post_path, class:"block py-2 text-terminal-text" %>
             <%= link_to "ログアウト", destroy_user_session_path, class:"block py-2 text-terminal-text", data: { turbo_method: :delete } %>
           <% else %>
-            <%= link_to "ユーザー登録", user_github_omniauth_authorize_path, class:"block py-2 text-terminal-text" %>
-            <%= link_to "ログイン", user_github_omniauth_authorize_path, class:"block py-2 text-terminal-text" %>
+            <%= link_to "ログイン", new_user_session_path, class:"block py-2 text-terminal-text" %>
           <% end %>
         </div>
       </div>
