@@ -1,7 +1,14 @@
 <% unattached_blobs_json = (@unattached_blobs || []).to_json %>
 
-<div class="container mx-auto px-4 py-8 max-w-7xl" data-controller="markdown-editor" data-markdown-editor-unattached-blobs-value="<%= unattached_blobs_json %>">
-  <%= form_with model: @post, local: true do |f| %>
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+  <%= form_with model: @post, local: true,
+    data: {
+      controller: "markdown-editor",
+      "markdown-editor-unattached-blobs-value": unattached_blobs_json,
+      "markdown-editor-images-allowed-value": true,
+      "markdown-editor-editor-height-value": 500,
+      "markdown-editor-preview-height-value": 540
+    } do |f| %>
     <div class="mb-6">
       <label for="post_title" class="block text-sm font-medium text-terminal-text mb-2" >
         タイトル
