@@ -86,8 +86,13 @@ export default class extends Controller {
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
+    input.className = 'test-upload-input';          // ← テストで掴む目印
+    input.style.position = 'fixed';
+    input.style.left = '-9999px';
+    document.body.appendChild(input);
     input.onchange = (e) => {
       Array.from(e.target.files).forEach(file => this.handleImageUpload(file));
+      setTimeout(() => input.remove(), 0);
     };
     input.click();
   }

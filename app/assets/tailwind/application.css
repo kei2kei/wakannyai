@@ -171,3 +171,5 @@
 .logo-fill:hover {
   fill: var(--color-terminal-accent);
 }
+
+.prose img { max-width: 100%; height: auto; }

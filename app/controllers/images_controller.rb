@@ -5,14 +5,16 @@ class ImagesController < ApplicationController
     uploaded_file = params[:image]
     return render json: { error: 'ファイルが添付されませんでした。' }, status: :unprocessable_entity unless uploaded_file
     return render json: { error: 'ファイルサイズが大きすぎます。' }, status: :payload_too_large if uploaded_file.size.to_i > MAX_SIZE
-    return render json: { error: 'ファイルタイプが無効です。' }, status: :unsupported_media_type unless ALLOWED.include?(uploaded_file.content_type)
+
+    detected = Marcel::MimeType.for(uploaded_file.tempfile, name: uploaded_file.original_filename)
+    return render json: { error: 'ファイルタイプが無効です。' }, status: :unsupported_media_type unless ALLOWED.include?(detected)
 
     if uploaded_file.present?
       begin
         blob = ActiveStorage::Blob.create_and_upload!(
-          io: uploaded_file.open,
+          io: uploaded_file.tempfile,
           filename: uploaded_file.original_filename,
-          content_type: uploaded_file.content_type,
+          content_type: detected,
           metadata: { uploader_id: current_user.id }
         )
 

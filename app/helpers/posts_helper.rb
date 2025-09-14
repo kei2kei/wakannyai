@@ -22,6 +22,11 @@ module PostsHelper
       a img table thead tbody tr td th
     ], attributes: %w[href src alt class id])
 
-    raw(sanitized_html)
+    doc = Nokogiri::HTML::DocumentFragment.parse(sanitized_html)
+    doc.css('a[href]').each do |a|
+      a['target'] = '_blank'
+      a['rel'] = 'noopener noreferrer nofollow'
+    end
+    raw(doc.to_html)
   end
 end
