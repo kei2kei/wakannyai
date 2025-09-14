@@ -16,23 +16,13 @@
   }
 }
 
-.CodeMirror {
-    height: 100% !important;
-    min-height: 500px !important;
-}
-
 .editor-toolbar {
     height: 40px !important;
     min-height: 40px !important;
 }
 
-#preview-container {
-    min-height: 500px;
-    height: 100%;
-}
-
-  #preview-container pre code { @apply bg-transparent p-0; }
-  #preview-container { font-family: "DotGothic16", ui-sans-serif, system-ui, sans-serif; }
+#preview-container pre code { @apply bg-transparent p-0; }
+#preview-container { font-family: "DotGothic16", ui-sans-serif, system-ui, sans-serif; }
 
 .drag-highlight {
   border: 2px dashed #007cba !important;

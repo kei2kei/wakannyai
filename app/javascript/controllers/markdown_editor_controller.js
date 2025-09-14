@@ -2,17 +2,22 @@ import { Controller } from "@hotwired/stimulus";
 import createDOMPurify from "dompurify";
 
 export default class extends Controller {
+  static targets = ["editor", "preview"]
   // サーバーから渡された未添付のBlob情報を受け取るためのValue
   static values = {
-    unattachedBlobs: Array
+    unattachedBlobs: Array,
+    imagesAllowed: { type: Boolean, default: true },
+    editorHeight: { type: Number, default: 220 },
+    previewHeight: { type: Number, default: 220 },
+    placeholder:   { type: String,  default: "Markdownで記事を書いてください..." }
   };
 
   connect() {
     console.log('🚀 Stimulus Controller Connected');
 
-    this.form = this.element.querySelector('form');
-    const textareaElement = this.element.querySelector('#markdown-editor');
-    this.previewContainer = this.element.querySelector('#preview-container');
+    this.form = this.element.closest('form') || this.element.querySelector('form')
+    const textareaElement = this.hasEditorTarget ? this.editorTarget : this.element.querySelector('textarea')
+    this.previewContainer = this.hasPreviewTarget ? this.previewTarget : this.element.querySelector('[data-markdown-editor-target="preview"], #preview-container')
     this.DOMPurify = createDOMPurify(window);
 
     if (!this.form || !textareaElement || !this.previewContainer) {
@@ -29,6 +34,19 @@ export default class extends Controller {
     this.initEasyMDE(textareaElement);
 
     this.updatePreview(textareaElement.value);
+    this.applyHeights();
+  }
+
+  applyHeights() {
+    if (this.easyMDE?.codemirror) {
+      this.easyMDE.codemirror.setSize(null, this.editorHeightValue || 220)
+    }
+
+    if (this.hasPreviewTarget) {
+      const h = this.previewHeightValue || this.editorHeightValue || 220
+      this.previewTarget.style.height = `${h}px`
+      this.previewTarget.style.overflowY = "auto"
+    }
   }
 
   initEasyMDE(textareaElement) {
@@ -47,29 +65,35 @@ export default class extends Controller {
       renderer: renderer,
     });
 
+    const baseToolbar = ["bold","italic","strikethrough","heading","|","quote",
+                      "unordered-list","ordered-list","|","link","|","code",
+                      "table","horizontal-rule","|","fullscreen"];
+
+    const toolbar = [...baseToolbar];
+    if (this.imagesAllowedValue) {
+      toolbar.splice(12, 0, {
+        name: "upload-image", action: () => this.triggerFileUpload(),
+        className: "fa fa-upload", title: "画像をアップロード",
+      });
+    }
+
     this.easyMDE = new EasyMDE({
       element: textareaElement,
       spellChecker: false,
       status: false,
       placeholder: "Markdownで記事を書いてください...",
       previewRender: (plainText) => this.safeHTML(marked.parse(plainText)),
-      toolbar: [
-        "bold", "italic", "strikethrough", "heading", "|", "quote", "unordered-list", "ordered-list", "|",
-        "link", "|", "code", "table", "horizontal-rule", "|",
-        {
-          name: "upload-image",
-          action: () => this.triggerFileUpload(),
-          className: "fa fa-upload",
-          title: "画像をアップロード",
-        },
-        "|", "fullscreen",
-      ],
+      toolbar,
       autosave: { enabled: false }
     });
 
+    this.easyMDE.codemirror.setSize(null, this.heightValue);
+
     const wrapper = this.easyMDE.codemirror.getWrapperElement();
-    wrapper.addEventListener('drop', (e) => this.handleDrop(e));
-    wrapper.addEventListener('paste', (e) => this.handlePaste(e));
+    if (this.imagesAllowedValue) {
+      wrapper.addEventListener('drop',  (e) => this.handleDrop(e));
+      wrapper.addEventListener('paste', (e) => this.handlePaste(e));
+    }
     // プレビューの同期&隠しフィールドの同期
     this.easyMDE.codemirror.on('change', () => {
       const markdownText = this.easyMDE.value();

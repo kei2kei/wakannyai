@@ -10,9 +10,17 @@
     <span><%= time_ago_in_words(comment.created_at) %>前</span>
   </div>
 
-  <div class="prose text-terminal-text">
-    <p><%= comment.content %></p>
-  </div>
+  <article class="prose prose-invert max-w-none
+                  border border-terminal-border rounded-lg
+                bg-terminal-input p-6 overflow-y-auto shadow-sm
+                prose-headings:text-terminal-text
+                prose-a:text-terminal-accent
+                prose-p: text-terminal-text
+                prose-pre:bg-terminal-input
+                prose-pre:text-terminal-text
+                prose-code:text-terminal-text">
+    <%= render_markdown(comment.content) %>
+  </article>
 
   <div class="mt-4 flex gap-2 justify-end items-center">
     <% if current_user == post.user && !post.has_best_comment? && comment.user != post.user %>
@@ -23,12 +31,17 @@
       <%= link_to "削除", post_comment_path(post, comment), data: { turbo_method: :delete, confirm: "本当に削除しますか？" }, class: "btn-terminal-danger" %>
     <% end%>
 
-    <button data-action="click->comment#showReplyForm" data-comment-id="<%= comment.id %>" class="btn-terminal">
+    <button data-action="click->comment#toggleReply" class="btn-terminal">
       返信
     </button>
   </div>
 
-  <div data-comment-target="replyFormContainer" class="mt-4"></div>
+  <div data-comment-target="replyFormContainer" class="mt-4 hidden">
+    <%= render "comments/form",
+          post: post,
+          comment: Comment.new,
+          parent_comment: comment %>
+  </div>
 
   <% if comment.replies.any? %>
     <div class="mt-4">
