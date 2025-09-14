@@ -20,7 +20,7 @@
                 prose-pre:bg-terminal-input
                 prose-pre:text-terminal-text
                 prose-code:text-terminal-text">
-        <%= rendered_content_html(@post.content) %>
+        <%= render_markdown(@post.content) %>
       </article>
     </div>
 
