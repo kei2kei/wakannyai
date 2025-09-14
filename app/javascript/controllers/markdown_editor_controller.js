@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
+import createDOMPurify from "dompurify";
 
 export default class extends Controller {
   // サーバーから渡された未添付のBlob情報を受け取るためのValue
@@ -12,6 +13,7 @@ export default class extends Controller {
     this.form = this.element.querySelector('form');
     const textareaElement = this.element.querySelector('#markdown-editor');
     this.previewContainer = this.element.querySelector('#preview-container');
+    this.DOMPurify = createDOMPurify(window);
 
     if (!this.form || !textareaElement || !this.previewContainer) {
       console.error("❌ フォーム、テキストエリア、またはプレビューコンテナが見つかりません。");
@@ -30,12 +32,15 @@ export default class extends Controller {
   }
 
   initEasyMDE(textareaElement) {
+    const escapeAttr = (s='') =>
+      String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     const renderer = new marked.Renderer();
     // デフォルトでMarkdownの画像を認識しないためrendererを定義
     renderer.image = (href, title, text) => {
-      const titleAttr = title ? ` title="${title}"` : '';
-      return `<img src="${href}" alt="${text}"${titleAttr} style="max-width: 100%; height: auto;" />`;
+      const titleAttr = title ? ` title="${escapeAttr(title)}"` : '';
+      return `<img src="${escapeAttr(href)}" alt="${escapeAttr(text)}"${titleAttr} style="max-width: 100%; height: auto;" />`;
     };
+
     marked.setOptions({
       breaks: true,
       gfm: true,
@@ -47,7 +52,7 @@ export default class extends Controller {
       spellChecker: false,
       status: false,
       placeholder: "Markdownで記事を書いてください...",
-      previewRender: (plainText) => marked.parse(plainText),
+      previewRender: (plainText) => this.safeHTML(marked.parse(plainText)),
       toolbar: [
         "bold", "italic", "strikethrough", "heading", "|", "quote", "unordered-list", "ordered-list", "|",
         "link", "|", "code", "table", "horizontal-rule", "|",
@@ -78,7 +83,25 @@ export default class extends Controller {
       this.previewContainer.innerHTML = '<p class="text-gray-500 italic">ここに内容のプレビューが表示されます</p>';
       return;
     }
-    this.previewContainer.innerHTML = marked.parse(markdownText);
+    this.previewContainer.innerHTML = this.safeHTML(marked.parse(markdownText));
+  }
+
+  safeHTML(html) {
+    return this.DOMPurify.sanitize(html, {
+      ALLOWED_TAGS: [
+        "p","br","strong","em","ul","ol","li","blockquote",
+        "code","pre","h1","h2","h3","h4","h5","h6","a","img",
+        "table","thead","tbody","tr","th","td","hr"
+      ],
+      ALLOWED_ATTR: [
+        "href","target","rel",
+        "src","alt","title","class","id",
+        "width","height","srcset","sizes","loading","decoding"
+      ],
+      ALLOW_DATA_ATTR: false,
+      FORBID_TAGS: ["style","script","iframe"],
+      FORBID_ATTR: [/^on/i]
+    });
   }
 
   triggerFileUpload() {
