@@ -31,14 +31,8 @@
     height: 100%;
 }
 
-  #preview-container h1 { @apply text-2xl font-bold text-terminal-text mb-4; }
-  #preview-container h2 { @apply text-xl font-semibold text-terminal-text mb-3 mt-5; }
-  #preview-container p { @apply text-terminal-text mb-4 leading-relaxed; }
-  #preview-container pre { @apply bg-gray-800 text-terminal-text p-4 rounded mb-4 overflow-x-auto; }
-  #preview-container code { @apply bg-gray-100 text-terminal-text px-1 rounded text-sm; }
-
-  #preview-container ul { @apply list-disc ml-6 mb-4 space-y-1; }
-  #preview-container blockquote { @apply border-l-4 border-blue-500 pl-4 bg-blue-50 py-2 mb-4; }
+  #preview-container pre code { @apply bg-transparent p-0; }
+  #preview-container { font-family: "DotGothic16", ui-sans-serif, system-ui, sans-serif; }
 
 .drag-highlight {
   border: 2px dashed #007cba !important;
@@ -177,3 +171,5 @@
 .logo-fill:hover {
   fill: var(--color-terminal-accent);
 }
+
+.prose img { max-width: 100%; height: auto; }

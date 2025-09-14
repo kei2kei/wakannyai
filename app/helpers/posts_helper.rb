@@ -17,11 +17,16 @@ module PostsHelper
     }).to_html
 
     # サニタイズして安全にする
-    sanitized_html = sanitize(html, tags: %w[
-      h1 h2 h3 h4 h5 h6 p br strong em ul ol li blockquote code pre
-      a img table thead tbody tr td th
-    ], attributes: %w[href src alt class id])
+    sanitized_html = sanitize(html,
+      tags: %w[h1 h2 h3 h4 h5 h6 p br strong em ul ol li blockquote code pre a img
+              table thead tbody tr td th hr],
+      attributes: %w[href target rel src alt title class id width height srcset sizes loading decoding])
 
-    raw(sanitized_html)
+    doc = Nokogiri::HTML::DocumentFragment.parse(sanitized_html)
+    doc.css('a[href]').each do |a|
+      a['target'] = '_blank'
+      a['rel'] = 'noopener noreferrer nofollow'
+    end
+    raw(doc.to_html)
   end
 end
