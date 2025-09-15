@@ -310,5 +310,8 @@ Devise.setup do |config|
   # When set to false, does not sign a user in automatically after their password is
   # changed. Defaults to true, so a user is signed in automatically after changing a password.
   # config.sign_in_after_change_password = true
-  config.omniauth :github, ENV['GITHUB_ID'], ENV['GITHUB_SECRET'], scope: 'user,public_repo,repo'
+  # config.omniauth :github, ENV['GITHUB_ID'], ENV['GITHUB_SECRET'], scope: 'user,public_repo,repo'
+  config.omniauth :github, ENV['GITHUB_APP_CLIENT_ID'], ENV['GITHUB_APP_CLIENT_SECRET'],
+                scope: 'read:user,user:email',
+                name:  :github_app
 end

@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
-  devise :rememberable, :omniauthable, omniauth_providers: %i[github]
+  devise :rememberable, :omniauthable, omniauth_providers: %i[github_app]
 
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -12,30 +12,26 @@ class User < ApplicationRecord
   after_create :assign_random_cat
 
   def github_client
-    @github_client ||= Octokit::Client.new(access_token: github_token) if github_token.present?
+    # @github_client ||= Octokit::Client.new(access_token: github_token) if github_token.present?
   end
 
   def can_sync_to_github?
-    github_token.present? && github_username.present?
+    github_installation_id.present? && github_repo_full_name.present?
   end
 
   private
 
-  def self.from_omniauth(auth)
-    find_or_create_by(provider: auth.provider, uid: auth.uid) do |user|
-      user.email = auth.info.email
-      user.name = auth.info.name
-      user.github_token = auth.credentials.token
-      user.github_username = auth.info.nickname
-    end.tap do |user|
-      # 既存ユーザーのトークンを更新
-      if user.persisted? && !user.new_record?
-        user.update!(
-          github_token: auth.credentials.token,
-          github_username: auth.info.nickname
-        )
-      end
-    end
+  def self.from_github_app_oauth(auth)
+    login = auth.info.nickname.presence || "user_#{auth.uid}"
+    email = auth.info.email.presence || "#{auth.uid}@users.noreply.github.com"
+    user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
+    user.email = user.email.presence || email
+    user.name = user.name.presence || auth.info.name.presence || login
+    user.github_app_user_token = auth.credentials.token
+    user.github_username = login
+
+    user.save!
+    user
   end
 
   def assign_random_cat
