@@ -11,12 +11,8 @@ class User < ApplicationRecord
   has_one :cat, dependent: :destroy
   after_create :assign_random_cat
 
-  def github_client
-    # @github_client ||= Octokit::Client.new(access_token: github_token) if github_token.present?
-  end
-
   def can_sync_to_github?
-    github_installation_id.present? && github_repo_full_name.present?
+    github_app_installation_id.present? && github_repo_full_name.present?
   end
 
   private
