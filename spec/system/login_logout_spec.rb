@@ -2,7 +2,7 @@
 require "rails_helper"
 
 RSpec.describe "Login/Logout", type: :system, js: true do
-  let(:user) { create(:user, :github_authenticated, name: "Me") }
+  let(:user) { create(:user, :with_github_app, name: "Me") }
 
   it "未ログイン時はヘッダーに『ログイン』が出る" do
     visit root_path

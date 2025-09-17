@@ -2,7 +2,7 @@
 require "rails_helper"
 
 RSpec.describe "Posts CRUD", type: :system, js: true do
-  let(:user) { create(:user, :github_authenticated) }
+  let(:user) { create(:user, :with_github_app) }
 
   before do
     login_as(user, scope: :user)

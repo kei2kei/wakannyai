@@ -2,7 +2,7 @@
 require "rails_helper"
 
 RSpec.describe "画像アップロード（エディタ統合）", type: :system, js: true do
-  let(:user) { create(:user, :github_authenticated) }
+  let(:user) { create(:user, :with_github_app) }
 
   before do
     # Warden login helper 有効

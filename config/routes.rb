@@ -5,6 +5,11 @@ Rails.application.routes.draw do
     delete 'sign_out', to: 'devise/sessions#destroy', as: :destroy_user_session
   end
 
+  get "/github/setup", to: "github/setup#update"
+  namespace :github do
+    resources :repos, only: [:index, :create]
+  end
+
   root 'posts#index'
   get 'posts/my_posts', to: 'posts#my_posts'
   resources :posts, only: %i[new create edit update show destroy] do

@@ -42,8 +42,27 @@
         <% end%>
       </div>
 
-      <% if current_user.can_sync_to_github? && current_user.id == @post.user_id %>
-        <%= button_to "GitHubに同期", sync_to_github_post_path(@post), method: :patch, class: "btn-terminal" %>
+      <% if current_user && current_user.id == @post.user_id %>
+        <% if current_user.github_app_installation_id.blank? %>
+          <% install_url = "https://github.com/apps/#{ENV['GITHUB_APP_SLUG']}/installations/new" %>
+          <%= link_to "GitHub App をインストール", install_url,
+                class: "btn-terminal-accent", data: { turbo: false } %>
+
+        <% elsif current_user.github_repo_full_name.blank? %>
+          <%= link_to "同期先を選ぶ", github_repos_path(return_to: post_path(@post)),
+                class: "btn-terminal-accent" %>
+
+        <% else %>
+          <div class="flex items-center gap-2">
+            <%= button_to "GitHubに同期", sync_to_github_post_path(@post),
+                  method: :patch, class: "btn-terminal" %>
+            <span class="text-xs text-gray-400">
+              同期先: <%= current_user.github_repo_full_name %>
+              <% if current_user.github_branch.present? %>(<%= current_user.github_branch %>)<% end %>
+              · <%= link_to "変更", github_repos_path(return_to: post_path(@post)), class: "underline" %>
+            </span>
+          </div>
+        <% end %>
       <% end %>
     </div>
 

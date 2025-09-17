@@ -68,19 +68,23 @@ class PostsController < ApplicationController
   end
 
   def sync_to_github
-    service = GithubService.new(current_user)
-
-    unless service.can_sync?
-      redirect_to @post, alert: 'GitHub連携を設定してください'
-      return
+    unless current_user&.id == @post.user_id
+      redirect_to @post, alert: "権限がありません" and return
     end
 
-    result = service.sync_post(@post)
+    result = GithubService.new(current_user).sync_post!(@post)
 
-    if result[:success]
-      redirect_to @post, notice: 'GitHubに同期しました！'
+    case result[:code]
+    when :missing_installation, :installation_inaccessible
+      redirect_to github_repos_path(return_to: post_path(@post)), alert: result[:error]
+    when :missing_repo
+      redirect_to github_repos_path(return_to: post_path(@post)), alert: result[:error]
     else
-      redirect_to @post, alert: "同期に失敗しました: #{result[:error]}"
+      if result[:success]
+        redirect_to @post, notice: "GitHubに同期しました！"
+      else
+        redirect_to @post, alert: "同期に失敗しました: #{result[:error]}"
+      end
     end
   end
 

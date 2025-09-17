@@ -2,7 +2,7 @@
 require "rails_helper"
 
 RSpec.describe "Navigation & Search", type: :system, js: true do
-  let(:user) { create(:user, :github_authenticated) }
+  let(:user) { create(:user, :with_github_app) }
 
   it "検索フォームで絞り込める（タイトル/本文/タグ）" do
     login_as(user, scope: :user)

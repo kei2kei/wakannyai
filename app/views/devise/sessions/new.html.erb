@@ -2,7 +2,7 @@
   <h2 class="text-3xl font-bold mb-6 text-terminal-accent">ログイン</h2>
   <div class="bg-terminal-input p-8 border border-terminal-border rounded-lg shadow-sm text-center max-w-sm w-full">
     <p class="text-terminal-text mb-4">GitHubアカウントでログインしてください</p>
-    <%= button_to "GitHubでログイン", user_github_omniauth_authorize_path,
+    <%= button_to "GitHubでログイン", user_github_app_omniauth_authorize_path,
                   class: "w-full py-2 bg-terminal-accent text-terminal-bg font-bold rounded-lg hover:bg-terminal-accent/80 transition-colors duration-200",
                   data: { turbo: false } %>
   </div>
