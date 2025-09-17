@@ -1,0 +1,60 @@
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+  <div class="bg-terminal-input border border-terminal-border rounded-lg p-6 shadow-sm">
+    <h2 class="text-xl font-bold text-terminal-text mb-6">同期先レポジトリを選択</h2>
+
+    <%= form_with url: github_repos_path, method: :post, local: true do %>
+      <input type="hidden" name="return_to" value="<%= @return_to %>">
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-terminal-text mb-2">レポジトリ</label>
+        <div class="space-y-2 max-h-[60vh] overflow-auto border border-terminal-border rounded-lg p-3 bg-terminal-input">
+          <% @repos.each do |r| %>
+            <label class="flex items-center justify-between gap-3 w-full px-3 py-2 border border-terminal-border/60 rounded-lg bg-terminal-input hover:bg-terminal-bg/40 cursor-pointer transition-colors duration-150">
+              <span class="flex items-center gap-3">
+                <input
+                  type="radio"
+                  name="repo_full_name"
+                  value="<%= r.full_name %>"
+                  class="accent-terminal-accent"
+                  <%= 'checked' if current_user&.github_repo_full_name == r.full_name %>
+                >
+                <span class="text-terminal-text font-medium"><%= r.full_name %></span>
+              </span>
+              <% if r.private %>
+                <span class="text-xs px-2 py-0.5 rounded bg-terminal-bg/40 text-gray-400 border border-terminal-border/60">
+                  private
+                </span>
+              <% end %>
+            </label>
+          <% end %>
+          <% if @repos.blank? %>
+            <p class="text-sm text-gray-400 px-1 py-2">インストール済みのレポジトリが見つかりません。</p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-terminal-text mb-2">
+          ブランチ（省略可: 既定ブランチ使用）
+        </label>
+        <input
+          type="text"
+          name="branch"
+          value="<%= current_user&.github_branch %>"
+          placeholder="例: main"
+          class="w-full px-3 py-2 border border-terminal-border bg-terminal-input text-terminal-text rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-terminal-accent/50 focus:border-terminal-accent"
+        >
+      </div>
+
+      <div class="flex justify-end gap-3">
+        <%= link_to "キャンセル", (@return_to.presence || root_path),
+              class: "px-4 py-2 border border-terminal-border text-terminal-text rounded-lg hover:bg-terminal-bg/40 transition-colors duration-200" %>
+        <button
+          type="submit"
+          class="px-6 py-2 bg-terminal-accent text-terminal-bg font-medium rounded-lg hover:bg-terminal-accent/80 focus:outline-none focus:ring-2 focus:ring-terminal-accent/50 focus:ring-offset-2 transition-colors duration-200">
+          保存
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>
