@@ -104,11 +104,11 @@ ActiveRecord::Schema[7.1].define(version: 2025_09_15_032925) do
     t.string "uid"
     t.integer "points", default: 0, null: false
     t.string "github_username"
-    t.bigint "github_installation_id"
+    t.bigint "github_app_installation_id"
     t.string "github_repo_full_name"
     t.text "github_app_user_token"
     t.string "github_branch", default: "main"
-    t.index ["github_installation_id"], name: "index_users_on_github_installation_id"
+    t.index ["github_app_installation_id"], name: "index_users_on_github_app_installation_id"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true
   end
 
