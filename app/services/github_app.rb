@@ -1,6 +1,7 @@
 class GithubApp
   class InstallationMissing < StandardError; end
 
+  # 鍵作成
   def self.jwt
     private_key = OpenSSL::PKey::RSA.new(ENV.fetch("GITHUB_APP_PRIVATE_KEY").gsub("\\n", "\n"))
     payload = {
@@ -11,12 +12,13 @@ class GithubApp
     JWT.encode(payload, private_key, "RS256")
   end
 
+  # クライアント取得
   def self.installation_client(installation_id)
     app_client = Octokit::Client.new(bearer_token: jwt)
-    app_client.installation(installation_id)
-    token = app_client.create_app_installation_access_token(installation_id)[:token]
+    iid   = installation_id.to_i
+    token = app_client.create_app_installation_access_token(iid)[:token]
     Octokit::Client.new(access_token: token)
   rescue Octokit::NotFound
-    return nil
+    nil
   end
 end

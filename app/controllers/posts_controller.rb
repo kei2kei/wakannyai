@@ -72,29 +72,19 @@ class PostsController < ApplicationController
       redirect_to @post, alert: "権限がありません" and return
     end
 
-    if current_user.github_app_installation_id.blank?
-      redirect_to github_repos_path(return_to: post_path(@post)),
-        alert: "まず GitHub App をインストールしてください" and return
-    end
+    result = GithubService.new(current_user).sync_post!(@post)
 
-    if current_user.github_repo_full_name.blank?
-      redirect_to github_repos_path(return_to: post_path(@post)),
-        alert: "同期先レポジトリを選択してください" and return
-    end
-
-    unless GithubApp.installation_client(current_user.github_app_installation_id)
-      current_user.update!(github_app_installation_id: nil, github_repo_full_name: nil)
-      redirect_to github_repos_path, alert: "GitHub App がアンインストールされたようです。再連携してください。"
-      return
-    end
-
-    result = GithubService.new(current_user).sync_post(@post)
-
-    if result[:success]
-      @post.update!(github_url: result[:url], github_synced_at: Time.current)
-      redirect_to @post, notice: "GitHubに同期しました！"
+    case result[:code]
+    when :missing_installation, :installation_inaccessible
+      redirect_to github_repos_path(return_to: post_path(@post)), alert: result[:error]
+    when :missing_repo
+      redirect_to github_repos_path(return_to: post_path(@post)), alert: result[:error]
     else
-      redirect_to @post, alert: "同期に失敗しました: #{result[:error]}"
+      if result[:success]
+        redirect_to @post, notice: "GitHubに同期しました！"
+      else
+        redirect_to @post, alert: "同期に失敗しました: #{result[:error]}"
+      end
     end
   end
 

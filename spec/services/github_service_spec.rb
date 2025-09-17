@@ -27,7 +27,7 @@ RSpec.describe GithubService do
         { content: { html_url: "https://github.com/owner/repo/blob/main/wakannyai_posts/title.md" } }.with_indifferent_access
       )
 
-      result = service.sync_post(post_rec)
+      result = service.sync_post!(post_rec)
 
       expect(result[:success]).to be true
       expect(result[:url]).to include("github.com/owner/repo")
@@ -39,17 +39,16 @@ RSpec.describe GithubService do
         { content: { html_url: "https://github.com/owner/repo/blob/main/wakannyai_posts/title.md" } }.with_indifferent_access
       )
 
-      result = service.sync_post(post_rec)
+      result = service.sync_post!(post_rec)
       expect(result[:success]).to be true
     end
   end
 
   context "異常系" do
     it "アンインストール（InstallationMissing）ならフレンドリーに失敗" do
-      allow(GithubApp).to receive(:installation_client).with(123)
-        .and_raise(GithubApp::InstallationMissing)
+      allow(GithubApp).to receive(:installation_client).with(123).and_return(nil)
 
-      result = service.sync_post(post_rec)
+      result = service.sync_post!(post_rec)
       expect(result[:success]).to be false
       expect(result[:error]).to match(/アンインストール|再接続/)
     end
@@ -64,7 +63,7 @@ RSpec.describe GithubService do
 
       allow(client).to receive(:create_contents).and_raise(Octokit::Forbidden)
 
-      result = described_class.new(user).sync_post(post_rec)
+      result = described_class.new(user).sync_post!(post_rec)
 
       expect(result[:success]).to be(false)
       expect(result[:error]).to include("権限")
@@ -88,7 +87,7 @@ RSpec.describe GithubService do
 
       allow(client).to receive(:create_contents).and_raise(Octokit::NotFound)
 
-      result = GithubService.new(user).sync_post(post_rec)
+      result = GithubService.new(user).sync_post!(post_rec)
 
       expect(result[:success]).to be(false)
       expect(result[:error]).to match(/リポジトリが見つかりません|Not\s*Found/i)
