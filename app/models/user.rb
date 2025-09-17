@@ -22,10 +22,9 @@ class User < ApplicationRecord
     uid      = auth.uid.to_s
     login    = auth.info.nickname.presence || "user_#{uid}"
     email    = (auth.info.email.presence || "#{uid}@users.noreply.github.com").downcase
-    user = find_by(provider: provider, uid: uid)
-    user ||= where("LOWER(email) = ?", email).first
-    user ||= new(email: email, password: Devise.friendly_token[0, 20])
-
+    user = find_by(provider: provider, uid: uid) ||
+        where("LOWER(email) = ?", email).first ||
+        new(email: email)
 
     user.provider ||= provider
     user.uid      ||= uid
