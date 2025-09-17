@@ -2,7 +2,7 @@
 require "rails_helper"
 
 RSpec.describe "Authorization", type: :system, js: true do
-  let(:me)    { create(:user, :github_authenticated, name: "Me") }
+  let(:me)    { create(:user, :with_github_app, name: "Me") }
   let(:other) { create(:user, name: "Other") }
 
   it "他人の投稿では編集/削除/解決ボタンが出ない" do

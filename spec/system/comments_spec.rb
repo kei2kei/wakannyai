@@ -2,7 +2,7 @@
 require "rails_helper"
 
 RSpec.describe "Comments", type: :system, js: true do
-  let(:author) { create(:user, :github_authenticated, name: "著者") }
+  let(:author) { create(:user, :with_github_app, name: "著者") }
   let(:answer) { create(:user, name: "回答者") }
   let(:post_)  { create(:post, user: author, title: "Q", content: "本文") }
 

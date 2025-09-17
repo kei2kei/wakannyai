@@ -1,27 +1,30 @@
-
 require 'rails_helper'
 
 RSpec.describe User, type: :model do
-  describe 'UserとCatのアソシエーション確認' do
-    # 💡 ユーザーが作成されたときに、catも自動で作成されるか？
-    it 'ひもづく猫を自動的に作成する' do
+  describe 'UserとCatのアソシエーション' do
+    it 'ユーザー作成時にCatが自動作成される' do
       user = create(:user)
       expect(user.cat).to be_present
     end
   end
 
-  describe 'UserのGithub連携' do
-    context 'ユーザーがGithubトークンを保持している' do
-      let(:user) { create(:user, github_token: 'test_token') }
-      it 'Octokitのクライアントが存在する' do
-        expect(user.github_client).to be_an_instance_of(Octokit::Client)
+  describe 'GitHub App 連携判定' do
+    context 'インストールIDと保存先リポが揃っている' do
+      it 'can_sync_to_github? が true' do
+        user = create(:user, :with_github_app)
+        expect(user.can_sync_to_github?).to eq(true)
       end
     end
 
-    context 'Githubトークンがない' do
-      let(:user) { create(:user, github_token: nil) }
-      it 'Githubクライアントはない' do
-        expect(user.github_client).to be_nil
+    context '不足している時' do
+      it 'インストールIDが無ければ false' do
+        user = create(:user, github_repo_full_name: 'someone/learning-logs')
+        expect(user.can_sync_to_github?).to eq(false)
+      end
+
+      it '保存先リポが無ければ false' do
+        user = create(:user, github_app_installation_id: 123)
+        expect(user.can_sync_to_github?).to eq(false)
       end
     end
   end
