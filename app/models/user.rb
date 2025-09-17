@@ -18,13 +18,21 @@ class User < ApplicationRecord
   private
 
   def self.from_github_app_oauth(auth)
-    login = auth.info.nickname.presence || "user_#{auth.uid}"
-    email = auth.info.email.presence || "#{auth.uid}@users.noreply.github.com"
-    user = find_or_initialize_by(provider: auth.provider, uid: auth.uid)
-    user.email = user.email.presence || email
-    user.name = user.name.presence || auth.info.name.presence || login
-    user.github_app_user_token = auth.credentials.token
-    user.github_username = login
+    provider = auth.provider
+    uid      = auth.uid.to_s
+    login    = auth.info.nickname.presence || "user_#{uid}"
+    email    = (auth.info.email.presence || "#{uid}@users.noreply.github.com").downcase
+    user = find_by(provider: provider, uid: uid)
+    user ||= where("LOWER(email) = ?", email).first
+    user ||= new(email: email, password: Devise.friendly_token[0, 20])
+
+
+    user.provider ||= provider
+    user.uid      ||= uid
+    user.email    ||= email
+    user.name       = user.name.presence || auth.info.name.presence || login
+    user.github_username        = login
+    user.github_app_user_token  = auth.credentials.token
 
     user.save!
     user
