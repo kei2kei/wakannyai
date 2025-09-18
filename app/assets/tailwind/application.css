@@ -173,3 +173,16 @@
 }
 
 .prose img { max-width: 100%; height: auto; }
+
+@layer components {
+  .guide-fig { @apply border border-terminal-border rounded-lg overflow-hidden bg-terminal-input; }
+  .guide-img { @apply w-full h-auto object-contain; }
+  .guide-cap { @apply text-xs text-gray-400 p-2; }
+
+  .guide-fig--thick { @apply border-2 rounded-xl; }
+  .guide-img--tall  { @apply max-h-80 md:max-h-[28rem]; }
+
+  .step-badge { @apply absolute left-2 top-2 inline-flex items-center justify-center
+                        w-8 h-8 rounded-full bg-terminal-accent text-terminal-bg
+                        text-sm font-bold; }
+  }

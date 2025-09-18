@@ -1,0 +1,166 @@
+<div class="container mx-auto px-4 py-10 max-w-6xl">
+  <header class="mb-10">
+    <h1 class="text-3xl font-bold">使い方ヘルプ</h1>
+    <p class="text-sm text-gray-400 mt-2">このページでは、日々の操作に必要な項目を画像つきで分かりやすく説明します。</p>
+  </header>
+
+  <nav class="mb-10 bg-terminal-input border border-terminal-border rounded-lg p-5">
+    <h2 class="text-lg font-semibold mb-3">目次</h2>
+    <ol class="list-decimal pl-6 space-y-1">
+      <li><a class="text-terminal-accent underline" href="#post-create">投稿の作成方法</a></li>
+      <li><a class="text-terminal-accent underline" href="#comments">コメント＆リプライの作成方法</a></li>
+      <li><a class="text-terminal-accent underline" href="#github-app">GitHub Appについて</a></li>
+      <li><a class="text-terminal-accent underline" href="#github-sync">同期先選択について</a></li>
+    </ol>
+  </nav>
+
+  <section id="post-create" class="mb-14">
+    <h2 class="text-2xl font-bold mb-4">投稿の作成方法</h2>
+    <div class="prose prose-invert max-w-none bg-terminal-input border border-terminal-border rounded-lg p-6">
+      <ol class="list-decimal pl-6 space-y-3">
+        <li><strong>「新規作成」</strong>をクリックします。</li>
+        <li><strong>タイトル</strong>を入力します（後から編集できます）。</li>
+        <li><strong>タグ</strong>をカンマ区切りで入力します（例: <code>Ruby, Rails, GitHub</code>）。</li>
+        <li><strong>内容</strong>はMarkdownで記述できます。改行は投稿後もそのまま反映されます。</li>
+        <li>画像はアップロードボタン/ドラッグ&ドロップ/貼り付けに対応。<strong>「保存」</strong>で投稿完了です。</li>
+      </ol>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+        <figure class="guide-fig">
+          <%= image_tag "help/new_post/click_create_link.png",
+                alt: "新規作成リンク",
+                width: 800, height: 450, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">① 新規作成ボタン</figcaption>
+        </figure>
+
+        <figure class="guide-fig md:col-span-2">
+          <%= image_tag "help/new_post/create_post.png",
+                alt: "保存ボタン",
+                width: 1200, height: 500, loading: "lazy", decoding: "async",
+                class: "guide-img guide-img--tall" %>
+          <figcaption class="guide-cap">② タイトル / ③ タグ / ④ Markdown編集 / ⑤ 保存</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="comments" class="mb-14">
+    <h2 class="text-2xl font-bold mb-4">コメント＆リプライの作成方法</h2>
+    <div class="prose prose-invert max-w-none bg-terminal-input border border-terminal-border rounded-lg p-6">
+      <ol class="list-decimal pl-6 space-y-3">
+        <li>投稿ページの下部に<strong>コメントフォーム</strong>があります（Markdown対応）。</li>
+        <li>他のコメントに返信したい場合は、コメント横の<strong>「返信」</strong>を押します。</li>
+        <li>プレビューで見た目を確認し、<strong>「投稿する」</strong>で送信します。</li>
+      </ol>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+        <figure class="guide-fig">
+          <%= image_tag "help/comment/comment_form.png",
+                alt: "コメントフォーム",
+                width: 800, height: 450, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">コメントフォーム（Markdown可）</figcaption>
+        </figure>
+
+        <figure class="guide-fig">
+          <%= image_tag "help/comment/reply_button.png",
+                alt: "リプライボタン",
+                width: 800, height: 450, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">返信ボタン</figcaption>
+        </figure>
+
+        <figure class="guide-fig">
+          <%= image_tag "help/comment/reply_form.png",
+                alt: "リプライフォーム",
+                width: 800, height: 450, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">返信フォーム</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="github-app" class="mb-14">
+    <h2 class="text-2xl font-bold mb-4">GitHub Appについて</h2>
+    <div class="prose prose-invert max-w-none bg-terminal-input border border-terminal-border rounded-lg p-6">
+      <ol class="list-decimal pl-6 space-y-3">
+        <li>投稿詳細ページの<strong>「GitHub App をインストール」</strong>からGitHubで承認します。</li>
+        <li>同期するアカウントを選択します。</li>
+        <li>レポジトリ選択画面に遷移します。</li>
+        <li><strong>「Only Selected Repository」</strong>を選択し、プルダウンから同期するレポジトリを選びます。</li>
+        <li><strong>「Install」</strong>を押すと、Github同期設定が完了です。</li>
+      </ol>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
+        <figure class="guide-fig">
+          <%= image_tag "help/github_app/github_app_link.png",
+                alt: "GithubAppリンク",
+                width: 600, height: 380, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">インストール</figcaption>
+        </figure>
+
+        <figure class="guide-fig">
+          <%= image_tag "help/github_app/select_account.png",
+                alt: "アカウント選択",
+                width: 600, height: 380, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">同期先アカウントの選択</figcaption>
+        </figure>
+
+        <figure class="guide-fig">
+          <%= image_tag "help/github_app/select_screen.png",
+                alt: "選択画面",
+                width: 600, height: 380, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">レポジトリ選択画面</figcaption>
+        </figure>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <figure class="guide-fig">
+          <%= image_tag "help/github_app/select_repository.png",
+                alt: "レポジトリ選択",
+                width: 600, height: 380, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">同期先レポジトリの選択</figcaption>
+        </figure>
+
+        <figure class="guide-fig">
+          <%= image_tag "help/github_app/install.png",
+                alt: "インストール",
+                width: 600, height: 380, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">インストールボタンの押下</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section id="github-sync" class="mb-14">
+    <h2 class="text-2xl font-bold mb-4">同期先選択について</h2>
+    <div class="prose prose-invert max-w-none bg-terminal-input border border-terminal-border rounded-lg p-6">
+      <ol class="list-decimal pl-6 space-y-3">
+        <li><a href="#github-app">GitHub Appをインストール</a>後同期先選択画面に遷移します。（投稿詳細画面からも遷移可能）</li>
+        <li>同期するレポジトリを選択します。同期できるのはGithub Appをインストール時に選択したレポジトリです。</li>
+        <li>同期するブランチ名を入力してください。何も入力しない場合はmainとなります。（新しいブランチを作ることはできません。既存のブランチ名を入力してください。）</li>
+      </ol>
+
+      <div class="grid grid-cols-1 gap-4 mt-5 place-items-center">
+        <figure class="guide-fig w-full md:w-3/4 lg:w-2/3">
+          <%= image_tag "help/github_sync/select_repo.png",
+                alt: "同期先選択画面",
+                width: 1200, height: 700, loading: "lazy", decoding: "async",
+                class: "guide-img" %>
+          <figcaption class="guide-cap">同期先選択</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <footer class="mt-12 text-sm text-gray-500">
+    <p>最終更新: <%= Time.current.strftime('%Y/%m/%d') %></p>
+  </footer>
+</div>

@@ -45,12 +45,31 @@
       <% if current_user && current_user.id == @post.user_id %>
         <% if current_user.github_app_installation_id.blank? %>
           <% install_url = "https://github.com/apps/#{ENV['GITHUB_APP_SLUG']}/installations/new" %>
-          <%= link_to "GitHub App をインストール", install_url,
-                class: "btn-terminal-accent", data: { turbo: false } %>
+          <div class="flex flex-col items-end gap-1 text-right">
+            <%= link_to "GitHub App をインストール",
+                  install_url,
+                  class: "btn-terminal-accent",
+                  data: { turbo: false } %>
+            <div class="text-xs text-gray-400">
+              ヘルプ：
+              <%= link_to "GitHub App の設定方法",
+                    help_path(anchor: "github-app"),
+                    class: "underline text-terminal-accent" %>
+            </div>
+          </div>
 
         <% elsif current_user.github_repo_full_name.blank? %>
-          <%= link_to "同期先を選ぶ", github_repos_path(return_to: post_path(@post)),
-                class: "btn-terminal-accent" %>
+          <div class="flex flex-col items-end gap-1 text-right">
+            <%= link_to "同期先を選ぶ",
+                  github_repos_path(return_to: post_path(@post)),
+                  class: "btn-terminal-accent" %>
+            <div class="text-xs text-gray-400">
+              ヘルプ：
+              <%= link_to "同期先の選び方",
+                    help_path(anchor: "github-sync"),
+                    class: "underline text-terminal-accent" %>
+            </div>
+          </div>
 
         <% else %>
           <div class="flex items-center gap-2">

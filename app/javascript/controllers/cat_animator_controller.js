@@ -54,7 +54,6 @@ export default class extends Controller {
     const animations = [];
 
     animations.push("cat-laying-down");
-    
 
     if (level >= 2) {
       animations.push("cat-walk");
