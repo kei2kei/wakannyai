@@ -30,6 +30,7 @@ Rails.application.routes.draw do
   end
 
   get 'tags/search', to: 'tags#search'
+  get "/help", to: "guides#help", as: :help
 
   # API関連
   post '/api/upload-image', to: 'images#upload'
