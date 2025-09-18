@@ -15,7 +15,7 @@ module MarkdownHelper
     html = Kramdown::Document.new(processed, {
       input: 'GFM',
       syntax_highlighter: 'rouge',
-      hard_wrap: false,
+      hard_wrap: true,
       auto_ids: true,
       toc_levels: (1..6),
       entity_output: :as_char
