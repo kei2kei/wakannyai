@@ -17,7 +17,7 @@ RSpec.describe "画像アップロード（エディタ統合）", type: :system
     find(".editor-toolbar .fa-upload", wait: 5).click
 
     # Stimulus が動的に挿した input を掴む（class があればそれを、無ければ type=file で拾う）
-    input = page.first('input.test-upload-input', visible: :all)
+    input = page.first('input.upload-input', visible: :all)
     input ||= page.find('input[type="file"]', visible: :all, wait: 5)
 
     input.set(Rails.root.join("spec/fixtures/files/sample.jpg"))
