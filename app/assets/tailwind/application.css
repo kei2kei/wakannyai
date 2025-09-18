@@ -68,6 +68,16 @@
   transition: all 0.2s ease;
 }
 
+.easy-mde-autogrow .CodeMirror { height: auto !important; min-height: var(--editor-min-h, 280px); }
+.easy-mde-autogrow .CodeMirror-scroll { height: auto !important; overflow-y: auto; max-height: 60vh; }
+.easy-mde-autogrow .CodeMirror-wrap pre.CodeMirror-line,
+.easy-mde-autogrow .CodeMirror-wrap pre.CodeMirror-line-like { white-space: pre-wrap; word-break: break-word; }
+
+.easy-mde-preview-autogrow { height: auto !important; max-height: none !important; overflow-y: visible !important; min-height: var(--preview-min-h, 280px); }
+
+.post-editor    { --editor-min-h: 500px; --preview-min-h: 540px; }
+.comment-editor { --editor-min-h: 160px; --preview-min-h: 200px; }
+
 .uploading-indicator {
   color: #f59e0b;
   font-style: italic;

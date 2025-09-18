@@ -6,9 +6,7 @@
       controller: "markdown-editor",
       "markdown-editor-unattached-blobs-value": unattached_blobs_json,
       "markdown-editor-images-allowed-value": true,
-      "markdown-editor-editor-height-value": 500,
-      "markdown-editor-preview-height-value": 540
-    } do |f| %>
+    }, class: "post-editor" do |f| %>
     <div class="mb-6">
       <label for="post_title" class="block text-sm font-medium text-terminal-text mb-2" >
         タイトル
@@ -45,7 +43,7 @@
         <div id="preview-container"
             class="prose prose-invert max-w-none
                   border border-terminal-border rounded-lg
-                bg-terminal-input p-6 overflow-y-auto shadow-sm
+                bg-terminal-input p-6 shadow-sm
                 prose-headings:text-terminal-text
                 prose-a:text-terminal-accent
                 prose-p: text-terminal-text

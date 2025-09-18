@@ -3,17 +3,20 @@ import createDOMPurify from "dompurify";
 
 export default class extends Controller {
   static targets = ["editor", "preview"]
-  // サーバーから渡された未添付のBlob情報を受け取るためのValue
+
   static values = {
     unattachedBlobs: Array,
     imagesAllowed: { type: Boolean, default: true },
-    editorHeight: { type: Number, default: 220 },
-    previewHeight: { type: Number, default: 220 },
     placeholder:   { type: String,  default: "Markdownで記事を書いてください..." }
   };
 
+  initialize() {
+    this._beforeCacheHandler = () => this.beforeCache();
+  }
+
   connect() {
     console.log('🚀 Stimulus Controller Connected');
+    document.addEventListener("turbo:before-cache", this._beforeCacheHandler);
 
     this.form = this.element.closest('form') || this.element.querySelector('form')
     const textareaElement = this.hasEditorTarget ? this.editorTarget : this.element.querySelector('textarea')
@@ -28,10 +31,11 @@ export default class extends Controller {
     const csrfTokenMeta = document.querySelector('meta[name="csrf-token"]');
     this.csrfToken = csrfTokenMeta ? csrfTokenMeta.getAttribute('content') : null;
 
-    // バリデーションエラーによる再描画時に、サーバーから渡された情報で状態を復元します
     this.uploadedBlobs = this.hasUnattachedBlobsValue ? [...this.unattachedBlobsValue] : [];
 
-    this.initEasyMDE(textareaElement);
+    if (!this.acquireExistingEditor(textareaElement)) {
+      this.initEasyMDE(textareaElement);
+    }
 
     this.updatePreview(textareaElement.value);
     this.applyHeights();
@@ -39,14 +43,26 @@ export default class extends Controller {
 
   applyHeights() {
     if (this.easyMDE?.codemirror) {
-      this.easyMDE.codemirror.setSize(null, this.editorHeightValue || 220)
+      const wrapper = this.easyMDE.codemirror.getWrapperElement();
+      wrapper.style.minHeight = `${this.editorHeightValue}px`;
+      wrapper.closest('.EasyMDEContainer')?.classList.add('easy-mde-autogrow');
     }
 
     if (this.hasPreviewTarget) {
-      const h = this.previewHeightValue || this.editorHeightValue || 220
-      this.previewTarget.style.height = `${h}px`
-      this.previewTarget.style.overflowY = "auto"
+      this.previewTarget.classList.add('easy-mde-preview-autogrow');
+      this.previewTarget.style.removeProperty('height');
+      this.previewTarget.style.removeProperty('maxHeight');
+      this.previewTarget.style.overflowY = 'visible';
     }
+  }
+
+  disconnect() {
+    document.removeEventListener("turbo:before-cache", this._beforeCacheHandler);
+    this.teardownEditor();
+  }
+
+  beforeCache() {
+    this.teardownEditor();
   }
 
   initEasyMDE(textareaElement) {
@@ -86,8 +102,6 @@ export default class extends Controller {
       toolbar,
       autosave: { enabled: false }
     });
-
-    this.easyMDE.codemirror.setSize(null, this.heightValue);
 
     const wrapper = this.easyMDE.codemirror.getWrapperElement();
     if (this.imagesAllowedValue) {
@@ -133,7 +147,7 @@ export default class extends Controller {
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
-    input.className = 'test-upload-input';          // ← テストで掴む目印
+    input.className = 'upload-input';
     input.style.position = 'fixed';
     input.style.left = '-9999px';
     document.body.appendChild(input);
@@ -244,5 +258,38 @@ export default class extends Controller {
   insertTemplate() {
     const templateText = '## 問題\n\n\n\n## 試したこと\n\n\n\n## 期待する結果\n\n\n\n## 解決方法\n\n\n\n## まとめ';
     this.easyMDE.codemirror.replaceSelection(templateText);
+  }
+
+  acquireExistingEditor(textareaElement) {
+    const wrapper = textareaElement.nextElementSibling;
+    const cmEl = wrapper?.querySelector?.('.CodeMirror');
+    const cm = cmEl && cmEl.CodeMirror;
+    if (!cm) return false;
+
+    this.cm = cm;
+    this.easyMDE = {
+      codemirror: cm,
+      value: () => cm.getValue()
+    };
+    cm.on('change', () => {
+      this.updatePreview(this.easyMDE.value());
+      this.syncHiddenFields(this.easyMDE.value());
+    });
+    return true;
+  }
+
+  teardownEditor() {
+    try {
+      if (this.easyMDE?.toTextArea) {
+        this.easyMDE.toTextArea();
+      } else if (this.cm?.toTextArea) {
+        this.cm.toTextArea();
+      }
+    } catch (e) {
+      console.warn("Editor teardown failed:", e);
+    } finally {
+      this.easyMDE = null;
+      this.cm = null;
+    }
   }
 }
